@@ -16,6 +16,63 @@ generating code.
 - **Claude Code hooks & permissions** (`.claude/settings.json`) — automation
   + allowlists.
 - **Agent memory** — persists my preferences across sessions.
+- **Backpressure toolchain** — the automated quality gate the agent loops
+  against (stood up in Phase 3). One umbrella script, `tools/check`, fans out
+  to:
+  - **pi-backend** (Python, run via **uv**): **ruff** (lint + format),
+    **mypy** (strict types), **pytest** (+ `pytest-asyncio`) for unit +
+    integration tests.
+  - **web** (TypeScript): **eslint**, **tsc --noEmit** (types), **Vitest**
+    (unit), **Playwright** (e2e — full run only, gated out of `--fast`).
+  - **Modes:** `tools/check` (run-all-and-report), `--fast` (lint + types +
+    unit, what the hook runs), `--fix` (safe ruff/eslint/prettier auto-fix),
+    plus per-component scoping (`tools/check pi-backend|web`).
+  - **Enforcement:** a `core.hooksPath` **pre-commit hook** runs
+    `tools/check --fast` (report-only); an advisory **`Stop` hook** surfaces
+    failures mid-session. `tools/setup` wires the hook once.
+
+---
+
+## How the backpressure toolchain works
+
+`tools/check` is a **thin orchestrator**: it doesn't lint or type-check
+anything itself — it just *calls* each tool and aggregates the **PASS/FAIL
+result**. The agent never reads ruff/mypy/pytest internals; it only acts on
+what `tools/check` reports (the per-step list + the exit code). The scripts
+exist precisely so the agent works with the *result*, not the raw machinery —
+that is the backpressure signal it loops against.
+
+It is **run-all-and-report**: every step runs even if an earlier one failed, so
+one pass surfaces *all* problems at once (exit non-zero if any failed).
+
+**Order the agent-loop runs (`--fast`), cheap-and-broad → slow-and-narrow:**
+
+*pi-backend* (via `uv`): **1.** ruff format `--check` → **2.** ruff check
+(lint) → **3.** mypy (strict types) → **4.** pytest (unit + integration).
+*web*: **5.** prettier `--check` → **6.** eslint → **7.** tsc `--noEmit` →
+**8.** Vitest (unit). The full check appends **9.** Playwright e2e (gated out
+of `--fast`). `--fix` prepends the auto-fixers (ruff/eslint then format last).
+
+Format/lint run first because they're the fastest and most common failures;
+types next; tests last because they're the slowest. The agent fixes top-down
+and re-runs until green.
+
+**Example agent-loop iteration:**
+
+```text
+$ tools/check --fast            # agent runs the gate after an edit
+▶ pi-backend: ruff format --check   [PASS]
+▶ pi-backend: ruff check            [PASS]
+▶ pi-backend: mypy                  [FAIL]   ← agent reads only this result
+    radio_cli.py:43: Returning Any from function declared to return "dict[...]"
+▶ pi-backend: pytest                [PASS]
+=== 1 check(s) failed ===
+  - pi-backend: mypy
+
+# agent fixes the one reported failure (cast the json.loads result), re-runs:
+$ tools/check --fast
+=== all checks passed ===        # green → only now is a commit allowed
+```
 
 ---
 

@@ -19,7 +19,9 @@ export default defineConfig({
   use: { baseURL: BASE_URL, ...devices['Desktop Chrome'] },
   webServer: {
     command:
-      `cd ../pi-backend && RADIO_CLI_PATH=tests/fixtures/fake_radio_cli ` +
+      // Absolute RADIO_CLI_PATH: scan() runs the binary with cwd=home, so a
+      // relative path would not resolve.
+      `cd ../pi-backend && RADIO_CLI_PATH="$(pwd)/tests/fixtures/fake_radio_cli" ` +
       `SUNFLOWER_STATIC_DIR=../web/out SUNFLOWER_PORT=${PORT} ` +
       `uv run python -m sunflower_radio`,
     url: `${BASE_URL}/api/state`,

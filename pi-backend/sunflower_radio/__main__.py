@@ -112,7 +112,7 @@ async def _shutdown(state: RadioState, cli: RadioCli, settings_path: Path) -> No
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    cli = RadioCli(path=resolve_radio_cli_path())
+    cli = RadioCli(path=resolve_radio_cli_path(), scan_dir=DEFAULT_STATIONS_PATH.parent)
     settings = load_settings()
     state = _load_stations(DEFAULT_STATIONS_PATH)
 

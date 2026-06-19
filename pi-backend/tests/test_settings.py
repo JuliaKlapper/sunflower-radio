@@ -1,7 +1,7 @@
 """Unit tests for settings load/save (~/.sunflower-radio.json).
 
 Persists volume + the selection as ServId+Label (NOT a bare index — D10), with
-NO I2S keys (Q9). An absent file yields defaults (volume 25, no selection).
+NO I2S keys (Q9). An absent file yields defaults (volume 70, no selection).
 """
 
 import json
@@ -13,7 +13,7 @@ from sunflower_radio.state import Selection
 
 def test_absent_file_yields_defaults(tmp_path: Path) -> None:
     settings = load_settings(tmp_path / "nope.json")
-    assert settings == Settings(volume=25, selection=None)
+    assert settings == Settings(volume=70, selection=None)
 
 
 def test_round_trip_persists_volume_and_servid_label(tmp_path: Path) -> None:

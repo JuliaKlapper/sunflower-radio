@@ -12,14 +12,24 @@ that was the legacy bug.
 
 import asyncio
 import json
+from pathlib import Path
 from typing import Any, cast
+
+# radio_cli v3.2.1 writes the full-scan result to this fixed filename in its
+# working directory (the --usage text claims "full_scan.json", but the shipped
+# binary actually uses this name). The JSON is NOT printed to stdout.
+_SCAN_FILENAME = "ensemblescan__.json"
 
 
 class RadioCli:
     """Async wrapper around the uGreen `radio_cli` board CLI."""
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, scan_dir: Path | None = None) -> None:
         self._path = path
+        # `scan()` runs radio_cli here (so its ensemblescan__.json lands in a
+        # known, writable place) and reads the result back. Defaults to the home
+        # dir of the running user (the service runs as root → /root).
+        self._scan_dir = scan_dir if scan_dir is not None else Path.home()
 
     async def boot(self) -> None:
         """Load DAB firmware + boot, analog (built-in DAC) output."""
@@ -38,16 +48,25 @@ class RadioCli:
         await self._run("-c", str(compid), "-e", str(srvid), "-f", str(tune_idx), "-p")
 
     async def scan(self) -> dict[str, Any]:
-        """Full ensemble scan (reboots the board); returns the parsed JSON."""
-        stdout = await self._run("-b", "D", "-u", "-k")
-        return cast(dict[str, Any], json.loads(stdout))
+        """Full ensemble scan (reboots the board, ~30s); returns the parsed JSON.
 
-    async def _run(self, *args: str) -> str:
+        radio_cli writes the result to `ensemblescan__.json` in its working dir
+        (NOT stdout), so we run it in `scan_dir` and read the file back. A
+        trailing `-k` (in the plan's original flags) shuts the board down before
+        the scan completes, so it is deliberately omitted.
+        """
+        await self._run("-b", "D", "-u", cwd=self._scan_dir)
+        return cast(dict[str, Any], json.loads((self._scan_dir / _SCAN_FILENAME).read_text()))
+
+    async def _run(self, *args: str, cwd: Path | None = None) -> str:
         proc = await asyncio.create_subprocess_exec(
             self._path,
             *args,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
+            # the scan prints a location questionnaire to stdin; never block on it
+            stdin=asyncio.subprocess.DEVNULL,
+            cwd=None if cwd is None else str(cwd),
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode != 0:

@@ -7,8 +7,9 @@ no stray `sudo`) is asserted by the test that reads the log this writes.
 
 Behaviour (Q13.3a/b):
 - Append the received argv (one shell-quoted line) to `$FAKE_RADIO_CLI_LOG`.
-- On a scan (`-u` present), print the sibling `ensemble_scan.json` to stdout —
-  this is exactly what the real `radio_cli -b D -u -k` emits.
+- On a scan (`-u` present), write the sibling `ensemble_scan.json` to
+  `ensemblescan__.json` in the current working directory — exactly what the real
+  `radio_cli -b D -u` does (it writes a file, NOT stdout).
 - Exit 0, unless `$FAKE_RADIO_CLI_RC` is set, in which case exit with that code
   (lets the test drive the wrapper's error path).
 
@@ -30,6 +31,6 @@ if log_path:
 
 if "-u" in argv:
     scan = Path(__file__).resolve().parent / "ensemble_scan.json"
-    sys.stdout.write(scan.read_text())
+    (Path.cwd() / "ensemblescan__.json").write_text(scan.read_text())
 
 sys.exit(int(os.environ.get("FAKE_RADIO_CLI_RC", "0")))

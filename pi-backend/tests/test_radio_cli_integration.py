@@ -37,7 +37,9 @@ class Harness:
 def harness(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Harness:
     log = tmp_path / "argv.log"
     monkeypatch.setenv("FAKE_RADIO_CLI_LOG", str(log))
-    return Harness(cli=RadioCli(path=str(FAKE)), log=log)
+    # scan_dir = tmp_path: the fake writes ensemblescan__.json there (its cwd),
+    # and scan() reads it back from the same dir.
+    return Harness(cli=RadioCli(path=str(FAKE), scan_dir=tmp_path), log=log)
 
 
 async def test_boot_passes_dab_analog_flags(harness: Harness) -> None:
@@ -68,11 +70,13 @@ async def test_no_invocation_is_prefixed_with_sudo(harness: Harness) -> None:
     assert all("sudo" not in call for call in harness.calls())
 
 
-async def test_scan_passes_full_ensemble_flags_and_returns_fixture_json(
+async def test_scan_passes_full_ensemble_flags_and_returns_file_json(
     harness: Harness,
 ) -> None:
+    # radio_cli writes the scan to ensemblescan__.json (not stdout) and the `-k`
+    # that aborts the scan is dropped.
     result = await harness.cli.scan()
-    assert harness.calls() == [["-b", "D", "-u", "-k"]]
+    assert harness.calls() == [["-b", "D", "-u"]]
     expected = json.loads((FIXTURES / "ensemble_scan.json").read_text())
     assert result == expected
 

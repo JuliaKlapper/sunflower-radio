@@ -3,7 +3,7 @@
 The selection is persisted as ServId + Label (the two broadcaster-mutable keys),
 NOT the bare positional index the legacy code used (D10) — the index is recomputed
 at startup by reconciling against the freshly-loaded station list. There are NO
-I2S keys (Q9, dropped). An absent file yields defaults (volume 25, no selection),
+I2S keys (Q9, dropped). An absent file yields defaults (volume 70, no selection),
 so a fresh Pi boots cleanly.
 """
 
@@ -14,7 +14,7 @@ from pathlib import Path
 from sunflower_radio.state import Selection
 
 DEFAULT_SETTINGS_PATH = Path.home() / ".sunflower-radio.json"
-_DEFAULT_VOLUME = 25
+_DEFAULT_VOLUME = 70
 
 
 @dataclass

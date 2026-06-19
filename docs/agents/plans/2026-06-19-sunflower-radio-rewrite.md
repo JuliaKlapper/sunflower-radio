@@ -249,17 +249,17 @@ deferred to Phase 9 (Q12.1 — "Phase 8" in the log's original numbering; see
 Migration Notes for the off-by-one from the inserted scaffold phase).
 
 **Tasks**:
-- [ ] Create the monorepo skeleton: `pi-backend/`, `web/`, `tools/`, `docs/agents/plans/` (docs already exists)
-- [ ] Move the baseline `files/...` tree into the new layout as the install source root (`pi-backend/` owns the Python service; the legacy `files/` mirror model is reworked in Phase 9)
-- [ ] Move `tools/install` under the new `tools/` (already there); leave its internals for Phase 9
-- [ ] **Preserve GPL3:** keep `LICENSE` and bablokb's copyright untouched; confirm `Readme.md` retains attribution (confirmed decision — derivative work stays GPL3)
-- [ ] Update root `Readme.md` lead to describe `sunflower-radio` (rename note), keeping original attribution section
-- [ ] Commit the restructure as one atomic "repo cutover" commit
+- [x] Create the monorepo skeleton: `pi-backend/`, `web/`, `tools/`, `docs/agents/plans/` (docs already exists) — created `web/` (placeholder `.gitkeep`); `pi-backend/`, `tools/`, `docs/agents/plans/` already present
+- [x] Move the baseline `files/...` tree into the new layout as the install source root — `git mv files/usr/local/sbin/simple-dab-radio.py → pi-backend/legacy/simple-dab-radio.py` (history preserved, `--follow` traces to `2d53d7d`); systemd unit kept under `files/` for Phase 9 (`files/` mirror reworked then)
+- [x] Move `tools/install` under the new `tools/` (already there); internals left for Phase 9
+- [x] **Preserve GPL3:** `LICENSE` untouched; `Readme.md` now explicitly names Bernhard Bablok + GPL-3.0 derivative-work note (attribution strengthened)
+- [x] Update root `Readme.md` lead to describe `sunflower-radio` (rename note), keeping original attribution section
+- [x] Commit the restructure as one atomic "repo cutover" commit — `461e62a` (decisions.md edit + stale `simple-dab-radio.service` deletion deliberately excluded; the latter is Phase 9's drop)
 
 **Automated Verification**:
-- [ ] `find . -maxdepth 2 -type d` shows `pi-backend web tools docs` present
-- [ ] `git log --oneline` shows preserved history + the cutover commit
-- [ ] `grep -rl "Bernhard Bablok" LICENSE Readme.md` still matches (attribution intact)
+- [x] `find . -maxdepth 2 -type d` shows `pi-backend web tools docs` present
+- [x] `git log --oneline` shows preserved history (`2d53d7d`…`3118f89`) + the cutover commit `461e62a`
+- [x] `grep -rl "Bernhard Bablok" LICENSE Readme.md` still matches (matches `Readme.md`, attribution intact)
 
 ---
 
@@ -271,22 +271,22 @@ Stand up automated quality feedback **before any feature code**, so every featur
 commit from here is gated (Q18.8). Two enforcement layers + advisory harness hook.
 
 **Tasks**:
-- [ ] `pi-backend/pyproject.toml`: configure **ruff** (lint+format), **mypy** (strict-ish), **pytest + pytest-asyncio**; declare deps (`fastapi`, `sse-starlette`, `uvicorn`, `evdev`, `pytest`, `pytest-asyncio`)
-- [ ] `web/` scaffold config: `package.json` scripts (`lint`/`typecheck`/`test`), **eslint** (+ `eslint-config-next`), **prettier**, `tsc --noEmit` (Q18.2)
-- [ ] `tools/check` orchestrator (Q18.3): runs full stack for both components, **run-all-and-report** (aggregate failures, not fail-fast); `tools/check pi-backend|web` scopes it; thin — delegates to each component's idiomatic runners
-- [ ] `tools/check --fix` (Q18.6): apply SAFE auto-fixes only (`ruff format`, `ruff check --fix`, `prettier --write`, `eslint --fix`), then re-verify and report the rest
-- [ ] `tools/check --fast` (Q18.5): ruff + mypy + eslint + `tsc --noEmit` + **unit tests** (pytest + Vitest), **excluding Playwright e2e**; whole-repo scope
-- [ ] `tools/git-hooks/pre-commit` → calls `tools/check --fast`, **report-only, zero side effects** (never mutates/re-stages — Q18.6); `tools/setup` wires `git config core.hooksPath tools/git-hooks` (Q18.4)
-- [ ] Advisory **`Stop` hook** in `.claude/settings.json` (Q18.7): if `git diff` shows tracked code changed, run `tools/check --fast` and **print** result (non-blocking)
-- [ ] Pre-approve `tools/` script names in checked-in `.claude/settings.json` (`Bash(tools/check*)`, `Bash(tools/deploy*)`, etc.) — never broad `ssh <pi> *` (Q17)
-- [ ] Write the backpressure model + "after editing run `tools/check`; loop until green; never commit until green" rule into the CLAUDE.md files (root pointer + `pi-backend/` + `web/` specifics — Q16, Q18.1)
+- [x] `pi-backend/pyproject.toml`: configured **ruff** (lint+format), **mypy** (strict) + per-module evdev ignore, **pytest + pytest-asyncio** (`asyncio_mode=auto`, `pythonpath=["."]`); deps `fastapi/uvicorn/sse-starlette/evdev` (+httpx for TestClient). Managed by **uv**, Python pinned to **3.11** (`.python-version`) to match the Pi; `evdev` gated `sys_platform=='linux'` so `uv sync` works on macOS. `legacy/` excluded from ruff+mypy
+- [x] `web/` scaffold config: `package.json` scripts (`lint`/`typecheck`/`test`/`test:e2e`/`format`), **eslint** (`next/core-web-vitals`+`next/typescript`), **prettier**, `tsconfig.json` (`tsc --noEmit`). Config only — npm install + app scaffold are Phase 7
+- [x] `tools/check` orchestrator: **run-all-and-report** (collects failures, non-zero if any); `tools/check pi-backend|web` scopes it; thin — delegates to `uv run …` / `npm run …`. Web steps skip gracefully until `web/node_modules` exists
+- [x] `tools/check --fix`: SAFE auto-fixes — **lint-fix first, then format last** (ruff check --fix → ruff format; eslint --fix → prettier) so whitespace wins; then re-verify
+- [x] `tools/check --fast`: ruff + mypy + eslint + `tsc --noEmit` + **unit tests** (pytest + Vitest), Playwright e2e **gated out**; whole-repo scope
+- [x] `tools/git-hooks/pre-commit` → `tools/check --fast`, **report-only, zero side effects**; `tools/setup` wires `git config core.hooksPath tools/git-hooks`
+- [x] Advisory **`Stop` hook** in `.claude/settings.json`: when `git diff` shows `pi-backend|web|tools` changed, runs `tools/check --fast` and prints (non-blocking, `|| true`)
+- [x] Pre-approved `tools/` script names in checked-in `.claude/settings.json` (`Bash(tools/check*|setup*|install*|deploy*|restart*|logs*|smoke*)`) — no broad ssh (user explicitly approved the settings edit past the self-modification guard)
+- [x] Wrote the backpressure rule into root + `pi-backend/` + `web/` CLAUDE.md (root rewritten to cross-cutting per Q16: layout, gate, pointers)
 
 **Automated Verification**:
-- [ ] `tools/check` exits non-zero on a deliberately-introduced lint error and zero when clean
-- [ ] `tools/check --fix` formats a deliberately-misformatted file and leaves it clean
-- [ ] `tools/check --fast` completes without running Playwright (verify e2e not invoked)
-- [ ] `git config core.hooksPath` returns `tools/git-hooks` after `tools/setup`
-- [ ] A commit with a lint error is **rejected** by the pre-commit hook; a clean commit succeeds
+- [x] `tools/check` exits **1** on an introduced lint error (`import os`/`x=1` scratch), **0** when clean
+- [x] `tools/check --fix` auto-fixed the scratch file and ended fully clean (exit 0) — after correcting the fix ordering (lint-fix before format)
+- [x] `tools/check --fast` completed (exit 0); Playwright not invoked (gated behind `FAST -eq 0`; web skipped pre-install)
+- [x] `git config core.hooksPath` → `tools/git-hooks` after `tools/setup`
+- [x] A commit with a lint error was **rejected** by the pre-commit hook (exit 1); the two clean Phase-3 commits succeeded through the hook
 
 ---
 

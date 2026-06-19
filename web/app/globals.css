@@ -1,0 +1,47 @@
+/* Sunflower theme: yellow/gold accents on a dark or light base. Honor
+   prefers-color-scheme only — no manual toggle (Q15e). Phase 8 builds the real
+   single-screen control panel; this is the scaffold shell. */
+
+:root {
+  --bg: #faf8f0;
+  --fg: #1c1a14;
+  --accent: #c79100;
+  --muted: #6b6553;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14130f;
+    --fg: #f3e7b3;
+    --accent: #ffd83b;
+    --muted: #9a9484;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+main {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+h1 {
+  color: var(--accent);
+}

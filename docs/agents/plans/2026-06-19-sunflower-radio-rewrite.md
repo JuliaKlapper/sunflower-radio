@@ -374,19 +374,19 @@ Stand up the App Router static-export shell and the SSE/api client plumbing
 (Q14, D5/C1). Smoke against the Pi (Q12 phase 6).
 
 **Tasks**:
-- [ ] `web/` Next.js App Router project; `next.config.js` with `output: 'export'`; `app/layout.tsx` + `app/page.tsx` (`"use client"` as needed)
-- [ ] `web/lib/types.ts`: `State`, `Station`, error types mirroring the frozen wire contract (Q8b)
-- [ ] `web/lib/api.ts`: typed fetch client for `GET /api/state|stations`, `POST /api/volume|station|scan`; `NEXT_PUBLIC_API_BASE_URL` for `next dev` against the Pi
-- [ ] `web/lib/useStateStream.ts`: `EventSource` hook subscribing to `/api/events`, exposing latest `State` + connection status; auto-reconnect (native `EventSource`)
-- [ ] `web/tests/`: Vitest + React Testing Library setup (jsdom); a smoke render test of `page.tsx`
-- [ ] Build static export and serve it via the Pi's FastAPI; confirm the shell loads from `http://<pi>/`
+- [x] `web/` Next.js App Router project; `next.config.ts` with `output: 'export'` (typed config, Next 15.5); `app/layout.tsx` (server) + `app/page.tsx` (`"use client"` scaffold rendering live state) + `app/globals.css` (yellow-on-dark, honors `prefers-color-scheme`). Added `web/.gitignore` (node_modules/.next/out/tsbuildinfo) and `playwright.config.ts` (testDir `tests/e2e`, so Playwright never grabs the Vitest specs)
+- [x] `web/lib/types.ts`: `RadioState`, `Station`, `ApiError` mirroring the frozen wire contract incl. the additive `advisory` (Q8b/D10)
+- [x] `web/lib/api.ts`: typed fetch client for `GET /api/state|stations`, `POST /api/volume|station|scan`; `NEXT_PUBLIC_API_BASE_URL` (default same-origin) for `next dev` against the Pi; throws `ApiRequestError` carrying the structured error `code`
+- [x] `web/lib/useStateStream.ts`: `'use client'` `EventSource` hook on `/api/events` (listens for the named `state` event), exposes latest `RadioState` + `connected`; native auto-reconnect; replays current state on (re)connect (lossless)
+- [x] `web/tests/`: Vitest + React Testing Library (jsdom) via `vitest.config.ts` + `tests/setup.ts` (`@testing-library/jest-dom/vitest`); `tests/page.test.tsx` smoke-renders `page.tsx` with a stubbed `EventSource`
+- [x] Build static export and serve it via FastAPI — **verified locally** (Pi browser check deferred): ran `python -m sunflower_radio` with `SUNFLOWER_STATIC_DIR=web/out` + the fake binary; `GET /` returned the exported `index.html` (`text/html`) and `GET /api/state` answered on the **same origin/port** (D5/C1). Literal `http://<pi>/` open folds into the Phase-9 on-Pi step
 
 **Automated Verification**:
-- [ ] `npm run build` produces a static `out/` with no SSR/route-handler errors
-- [ ] `tools/check web` passes (eslint + tsc + Vitest)
+- [x] `npm run build` produces a static `out/` (`index.html`, `_next/`, `404.html`) with no SSR/route-handler errors; the page bundle references `/api/events` (SSE wired)
+- [x] `tools/check web --fast` passes (prettier + eslint + tsc + Vitest, 1 test green). NB: the **full** `tools/check web` also runs Playwright, which has no specs until Phase 8 — that step goes green in Phase 8
 
 **Manual Verification**:
-- [ ] Open `http://192.168.1.106/` — the scaffold page loads and `GET /api/state` data is visible in the UI (live data round-trips through the static export served by the Pi)
+- [ ] Open `http://192.168.1.106/` — the scaffold page loads and `GET /api/state` data is visible in the UI. **Deferred to Phase 9** (needs the backend deps on the Pi); the same-origin serving + live round-trip is already proven locally (above)
 
 ---
 

@@ -1,0 +1,15 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# typescript / build
+*.tsbuildinfo
+next-env.d.ts
+
+# testing
+/coverage
+/playwright-report/
+/test-results/

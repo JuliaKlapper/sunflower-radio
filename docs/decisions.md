@@ -27,9 +27,17 @@ HTTP API. Append new entries; keep alternatives and rationale so the
   `pretest:e2e` builds first); 2 specs across two browser contexts assert
   station + volume SSE convergence + reconnect resync. **Full `tools/check`
   (both components, incl. Playwright) passes.**
-- **STILL PENDING (on-Pi, needs the hardware + user):** run `tools/install` on
-  the Pi → cutover; `tools/smoke` against the live service; `http://<pi>/`
-  browser check; GPIO-3 shutdown-button verify; clean-install reboot acceptance.
+- **ON-PI INSTALL DONE 2026-06-19** (after an accidental Pi shutdown/reboot left
+  the legacy `dabboard` autostarting + failing on a stale station — the D10 case):
+  repo working tree rsync'd to `~/sunflower-radio`, `sudo tools/install` ran →
+  `dabboard` disabled, `sunflower-radio.service` enabled+active on :80 (60
+  stations from `/root/stations.json`, board tuned #0 Dlf). `tools/smoke` PASS;
+  `tools/restart`/`tools/logs` PASS. Survives reboot now (service enabled).
+- **STILL PENDING (manual hardware, needs the user at the Pi):** `http://<pi>/`
+  browser check; two-device + knob SSE convergence; Rescan overlay + audio;
+  GPIO-3 shutdown-button → `ExecStop=radio_cli -k`; reboot acceptance.
+- **NOTE:** the Phase-9 commit `c93d008` is NOT yet pushed (user pushes
+  explicitly). The Pi runs from an rsync of the working tree, not a git pull.
 
 **(below: state as of Phase 8)**
 

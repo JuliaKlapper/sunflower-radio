@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#
+# tools/deploy — push the latest app build to the Pi and restart the service.
+#
+# For iterating AFTER the one-time tools/install (which creates the venv + unit).
+# Builds the static UI, rsyncs the package source + web/out into the Pi's
+# /opt/sunflower-radio, then restarts. The Pi ssh target lives in one place (Q17;
+# override with SUNFLOWER_PI_SSH).
+set -euo pipefail
+
+PI_SSH="${SUNFLOWER_PI_SSH:-gingerberry@192.168.1.106}"
+APP_DIR="/opt/sunflower-radio"
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+
+echo "▶ building web static export"
+npm --prefix "$REPO/web" run build
+
+echo "▶ deploying to $PI_SSH:$APP_DIR"
+# --rsync-path runs the remote rsync under sudo so it can write /opt (the Pi has
+# passwordless sudo). NEVER ship tests/ (PATH-shadowing the fake radio_cli).
+rsync -az --delete --rsync-path="sudo rsync" \
+  --exclude '__pycache__' \
+  "$REPO/pi-backend/sunflower_radio/" "$PI_SSH:$APP_DIR/sunflower_radio/"
+rsync -az --delete --rsync-path="sudo rsync" \
+  "$REPO/web/out/" "$PI_SSH:$APP_DIR/web/out/"
+
+echo "▶ restarting sunflower-radio.service"
+ssh "$PI_SSH" "sudo systemctl restart sunflower-radio.service"
+echo "✓ deployed"

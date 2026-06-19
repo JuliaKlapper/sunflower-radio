@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#
+# tools/restart — restart the sunflower-radio service on the Pi.
+# The Pi ssh target lives in one place (Q17; override with SUNFLOWER_PI_SSH).
+set -euo pipefail
+
+PI_SSH="${SUNFLOWER_PI_SSH:-gingerberry@192.168.1.106}"
+
+echo "▶ restarting sunflower-radio.service on $PI_SSH"
+ssh "$PI_SSH" "sudo systemctl restart sunflower-radio.service"
+ssh "$PI_SSH" "systemctl is-active sunflower-radio.service"

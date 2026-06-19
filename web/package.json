@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:unit": "vitest run",
+    "pretest:e2e": "next build",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

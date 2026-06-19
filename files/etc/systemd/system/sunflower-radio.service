@@ -1,0 +1,26 @@
+# sunflower-radio — the async DAB+ controller (rotary + HTTP/SSE API) in one
+# process. Installed by tools/install (mirrored from files/ → /). Replaces the
+# legacy dabboard.service (Phase 9 cutover).
+#
+# Runs as root because it binds port 80 and drives the rotary input devices. The
+# app code + static UI live under /opt/sunflower-radio (tools/install lays them
+# out + builds the venv); RADIO_CLI_PATH defaults to /usr/local/sbin/radio_cli.
+
+[Unit]
+Description=Sunflower Radio (DAB+ controller: rotary + HTTP/SSE)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/sunflower-radio
+Environment=SUNFLOWER_STATIC_DIR=/opt/sunflower-radio/web/out
+ExecStart=/opt/sunflower-radio/venv/bin/python -m sunflower_radio
+# Silence the board on stop even if the in-process graceful shutdown is skipped
+# (the shutdown chain must survive a hard stop — session notes).
+ExecStop=/usr/local/sbin/radio_cli -k
+Restart=on-failure
+TimeoutStopSec=120s
+
+[Install]
+WantedBy=multi-user.target

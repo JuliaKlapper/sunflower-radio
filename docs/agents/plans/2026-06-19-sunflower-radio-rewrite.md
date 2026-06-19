@@ -427,19 +427,19 @@ Make `tools/install` deploy both the Python service and the `web/out/` build, an
 atomically swap `dabboard.service` → `sunflower-radio.service` (Q11, Q12.1, Q17).
 
 **Tasks**:
-- [ ] Rewrite `tools/install`: `PROJECT="sunflower-radio"`; install `pi-backend/` source + `web/out/` static build; never ship `tests/`; configure rotary overlays in **`/boot/firmware/config.txt`** (modern bookworm), not legacy `/boot/config.txt`
-- [ ] New `files/etc/systemd/system/sunflower-radio.service`: `ExecStart` the new entrypoint, **`ExecStop=<radio_cli> -k`** preserved, `TimeoutStopSec=120s`, `Restart=on-failure`, `User=root`, `WantedBy=multi-user.target` (shutdown chain must survive — session notes)
-- [ ] Cutover: disable+remove `dabboard.service`, enable `sunflower-radio.service`, atomic swap (no window where the repo and Pi disagree on unit name)
-- [ ] `tools/deploy` (rsync build → Pi), `tools/restart` (ssh systemctl restart), `tools/logs` (ssh journalctl -u) — each holds the host `gingerberry@192.168.1.106` in one place (Q17); confirm script names pre-approved (Phase 3)
-- [ ] **Playwright e2e (carried from Phase 8):** install Chromium, add a `playwright.config` `webServer` that launches the real backend (`uv run python -m sunflower_radio` against `tests/fixtures/fake_radio_cli` + the built `web/out/`); specs open two browser contexts and assert a volume/station change in one converges live on the other via SSE, plus reconnect-after-drop resyncs via `GET /api/state` (Q13.5 Layer 2). After this, the **full** `tools/check web` (incl. Playwright) goes green
-- [ ] Verify `gpio-shutdown` overlay + GPIO 3 shutdown button still work post-cutover (session notes — preserve)
-- [ ] Drop the stale `simple-dab-radio.service`, legacy `/boot/config.txt` notes, and disabled `radio-cli-shutdown.service` per the deferred-cleanup session note
+- [x] Rewrite `tools/install`: `PROJECT="sunflower-radio"`; ships `pi-backend/sunflower_radio/` + `web/out/` to `/opt/sunflower-radio` + a `--system-site-packages` venv (apt `python3-evdev`, pip `fastapi/uvicorn/sse-starlette`), never ships `tests/`; rotary overlays in **`/boot/firmware/config.txt`** keeping pins **17/27/22**; idempotent + atomic legacy-service teardown
+- [x] New `files/etc/systemd/system/sunflower-radio.service`: `ExecStart=/opt/sunflower-radio/venv/bin/python -m sunflower_radio`, **`ExecStop=/usr/local/sbin/radio_cli -k`**, `TimeoutStopSec=120s`, `Restart=on-failure`, `User=root`, `WorkingDirectory`+`SUNFLOWER_STATIC_DIR` env, `WantedBy=multi-user.target`
+- [ ] Cutover: disable+remove `dabboard.service`, enable `sunflower-radio.service`, atomic swap (no window where the repo and Pi disagree on unit name) — **on-Pi step (folded into `tools/install`'s `cutover_services`)**
+- [x] `tools/deploy` (rsync build → Pi via `sudo rsync`), `tools/restart` (ssh systemctl restart), `tools/logs` (ssh journalctl -u) — ssh target in one place via `SUNFLOWER_PI_SSH` default `gingerberry@192.168.1.106` (Q17); names pre-approved (Phase 3)
+- [x] **Playwright e2e (carried from Phase 8):** Chromium installed; `playwright.config` `webServer` launches the real backend (`uv run python -m sunflower_radio` against `tests/fixtures/fake_radio_cli` + `web/out/` on :8137; `pretest:e2e` builds the export first); 2 specs across two browser contexts assert station + volume changes converge live via SSE, plus reconnect resyncs on connect. **Full `tools/check` (incl. Playwright) is GREEN.**
+- [ ] Verify `gpio-shutdown` overlay + GPIO 3 shutdown button still work post-cutover (session notes — preserve) — **on-Pi manual step**
+- [x] Dropped the stale `simple-dab-radio.service` + `dabboard.service` from the repo (`files/` now holds only `sunflower-radio.service`); `radio-cli-shutdown.service` exists only on the Pi and is torn down by `cutover_services` (on-Pi)
 
 **Automated Verification**:
-- [ ] `tools/install` on the Pi completes without error; `systemctl is-enabled sunflower-radio.service` → `enabled`; `dabboard.service` gone
-- [ ] `tools/smoke` passes against the freshly-installed service
-- [ ] `tools/restart` / `tools/logs` work and require no broad-ssh approval prompt
-- [ ] `tools/check` (full, incl. the Phase-8-carried Playwright e2e) passes — the last not-yet-green gate
+- [ ] `tools/install` on the Pi completes without error; `systemctl is-enabled sunflower-radio.service` → `enabled`; `dabboard.service` gone — **on-Pi**
+- [ ] `tools/smoke` passes against the freshly-installed service — **on-Pi**
+- [ ] `tools/restart` / `tools/logs` work and require no broad-ssh approval prompt — **on-Pi**
+- [x] `tools/check` (full, incl. the Phase-8-carried Playwright e2e) passes — the last not-yet-green gate **— GREEN (both components, 2 e2e specs)**
 
 **Manual Verification** (clean-install acceptance):
 - [ ] Fresh `tools/install` + reboot: radio auto-starts, knob works, `http://<pi>/` works, **audio plays**

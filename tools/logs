@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#
+# tools/logs — tail the sunflower-radio service journal on the Pi.
+#
+# Usage: tools/logs            follow live (Ctrl-C to stop)
+#        tools/logs -n 200     last 200 lines, no follow
+# The Pi ssh target lives in one place (Q17; override with SUNFLOWER_PI_SSH).
+set -euo pipefail
+
+PI_SSH="${SUNFLOWER_PI_SSH:-gingerberry@192.168.1.106}"
+
+if [ "$#" -eq 0 ]; then
+  exec ssh -t "$PI_SSH" "sudo journalctl -u sunflower-radio.service -f"
+fi
+exec ssh "$PI_SSH" "sudo journalctl -u sunflower-radio.service $*"

@@ -1,100 +1,145 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # --------------------------------------------------------------------------
-# This script installs files and services specific to this project.
+# tools/install — install sunflower-radio on the Raspberry Pi.
 #
-# Author: Bernhard Bablok
-# License: GPL3
+# Lays down the async Python service + the statically-exported web UI and
+# atomically cuts the autostart over from the legacy dabboard.service to
+# sunflower-radio.service (Phase 9). Run on the Pi as root (passwordless sudo).
 #
-# Website: https://github.com/bablokb/simple-dab-radio
+#   App code + UI  ->  /opt/sunflower-radio/{sunflower_radio,web/out} + venv
+#   systemd unit   ->  /etc/systemd/system/sunflower-radio.service (files/ mirror)
+#   rotary overlays -> /boot/firmware/config.txt (modern bookworm), pins 17/27/22
 #
+# GPL3 derivative of simple-dab-radio by Bernhard Bablok (attribution preserved).
 # --------------------------------------------------------------------------
+set -euo pipefail
 
-PACKAGES="python3-evdev"
-PACKAGES_PIP=""
-PROJECT="simple-dab-radio"
+PROJECT="sunflower-radio"
+APP_DIR="/opt/$PROJECT"
+# evdev via apt avoids a from-source build; python3-venv/pip build the app venv.
+PACKAGES="python3-evdev python3-venv python3-pip rsync"
+# Pure-Python web deps installed into the venv (evdev comes from system-site).
+PIP_PACKAGES="fastapi uvicorn sse-starlette"
+
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+
+log() { echo -e "[INFO] $*" >&2; }
+
+require_root() {
+  if [ "$(id -u)" -ne 0 ]; then
+    echo "tools/install must run as root (try: sudo tools/install)" >&2
+    exit 1
+  fi
+}
 
 # --- basic packages   ------------------------------------------------------
 
-check_packages() {
-  local p
-  for p in "$@"; do
-    echo -en "Checking $p ... " >&2
-    dpkg -s "$p" 2>/dev/null | grep -q "Status.*ok" || return 0
-    echo "ok" >&2
-  done
-  return 1
-}
-
-get_new_packages() {
-  local p packages
-  for p in "$@"; do
-    echo -en "Checking $p ... " >&2
-    if dpkg -s "$p" 2>/dev/null | grep -q "Status.*ok"; then
-      echo "ok" >&2
+install_packages() {
+  local p missing=""
+  for p in $PACKAGES; do
+    if dpkg -s "$p" 2>/dev/null | grep -q "Status.*ok installed"; then
+      log "package $p ... ok"
     else
-      echo "not installed" >&2
-      packages+=" $p"
+      missing+=" $p"
     fi
   done
-  echo "$packages"
-}
-
-install_packages() {
-  new_packages=$(get_new_packages $PACKAGES)
-  if [ -n "$new_packages" ]; then
-    echo -e "[INFO] installing additional packages" 2>&1
+  if [ -n "$missing" ]; then
+    log "installing packages:$missing"
     apt-get update
-    apt-get -y --no-upgrade install $new_packages
+    apt-get -y install $missing
   fi
-
-  # install PIP3 packages
-  [ -n "$PACKAGES_PIP" ] && pip3 --disable-pip-version-check install $PACKAGES_PIP
 }
 
-# --- install specific files   ----------------------------------------------
+# --- install the systemd unit (files/ -> / mirror)   -----------------------
 
 install_files() {
-  echo -e "[INFO] installing project files" 2>&1
-
-  for f in `find $(dirname "$0")/../files/ -type f -not -name "*.pyc"`; do
-    target="${f#*files}"
+  log "installing system files (files/ -> /)"
+  local f target target_dir
+  for f in $(find "$REPO/files/" -type f -not -name "*.pyc"); do
+    target="${f#"$REPO/files"}"
     target_dir="${target%/*}"
     [ ! -d "$target_dir" ] && mkdir -p "$target_dir"
     cp "$f" "$target"
     chown root:root "$target"
   done
-  chmod 755 "/usr/local/sbin/$PROJECT.py"
 }
 
-# --- configure system   ----------------------------------------------------
+# --- install the app: source + static UI + venv   --------------------------
+
+install_app() {
+  log "installing app to $APP_DIR"
+  mkdir -p "$APP_DIR"
+
+  # Ship the package source + the built static UI; NEVER ship tests/ (the fake
+  # radio_cli under tests/fixtures would PATH-shadow the real board — Q13.3c).
+  rsync -a --delete \
+    --exclude '__pycache__' \
+    "$REPO/pi-backend/sunflower_radio/" "$APP_DIR/sunflower_radio/"
+
+  if [ ! -d "$REPO/web/out" ]; then
+    echo "tools/install: web/out missing — run 'npm --prefix web run build' first" >&2
+    exit 1
+  fi
+  mkdir -p "$APP_DIR/web"
+  rsync -a --delete "$REPO/web/out/" "$APP_DIR/web/out/"
+
+  # venv with system-site-packages so the apt-installed python3-evdev is visible;
+  # the web deps are pure-Python wheels.
+  if [ ! -x "$APP_DIR/venv/bin/python" ]; then
+    log "creating venv at $APP_DIR/venv"
+    python3 -m venv --system-site-packages "$APP_DIR/venv"
+  fi
+  log "installing pip packages into the venv: $PIP_PACKAGES"
+  "$APP_DIR/venv/bin/pip" install --quiet --upgrade pip
+  "$APP_DIR/venv/bin/pip" install --quiet --upgrade $PIP_PACKAGES
+}
+
+# --- configure rotary overlays (modern bookworm path)   --------------------
 
 configure_system() {
-  local reboot=""
-  if ! grep -q "^dtoverlay=rotary-encoder" /boot/config.txt ; then
-    echo -e "[INFO] configuring rotary-encoder in /boot/config.txt" 2>&1
-    echo "dtoverlay=rotary-encoder,pin_a=17,pin_b=27,relative_axis=1" >> /boot/config.txt
-    echo "dtoverlay=gpio-key,gpio=22,keycode=28,label=\"PUSH\"" >> /boot/config.txt
-    reboot="yes"
-  fi
-
-  if [ -n "$reboot" ]; then
-    echo -e "[INFO] reboot the system to activate the changes" 2>&1
+  local cfg="/boot/firmware/config.txt"
+  [ -f "$cfg" ] || cfg="/boot/config.txt"  # fall back on a pre-bookworm image
+  # Keep the EXISTING, working pins 17/27/22 (Phase 1: the knob is physically
+  # wired to these; do NOT switch to 18/23).
+  if ! grep -q "^dtoverlay=rotary-encoder" "$cfg"; then
+    log "configuring rotary-encoder overlays in $cfg (pins 17/27/22)"
+    {
+      echo "dtoverlay=rotary-encoder,pin_a=17,pin_b=27,relative_axis=1"
+      echo "dtoverlay=gpio-key,gpio=22,keycode=28,label=\"PUSH\""
+    } >> "$cfg"
+    log "reboot required to activate the rotary overlays"
+  else
+    log "rotary-encoder overlay already present in $cfg"
   fi
 }
 
-# --- activate service   ----------------------------------------------------
+# --- atomic service cutover: dabboard -> sunflower-radio   ------------------
 
-enable_services() {
-  echo -e "[INFO] enabeling $PROJECT.service" 2>&1
+cutover_services() {
+  systemctl daemon-reload
+  # Tear down the legacy autostart so there is no window where two services own
+  # the board.
+  for legacy in dabboard.service simple-dab-radio.service radio-cli-shutdown.service; do
+    if systemctl list-unit-files "$legacy" >/dev/null 2>&1 && \
+       systemctl is-enabled "$legacy" >/dev/null 2>&1; then
+      log "disabling legacy $legacy"
+      systemctl disable --now "$legacy" || true
+    fi
+  done
+  log "enabling $PROJECT.service"
   systemctl enable "$PROJECT.service"
+  log "starting $PROJECT.service"
+  systemctl restart "$PROJECT.service"
 }
 
 # --- main program   --------------------------------------------------------
 
+require_root
 install_packages
-
 install_files
+install_app
 configure_system
-enable_services
+cutover_services
 
-echo "[INFO] installation completed"
+log "installation completed — $PROJECT.service is enabled and running"
+log "verify with: tools/smoke   (and open http://<pi>/ )"

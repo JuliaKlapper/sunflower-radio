@@ -6,9 +6,32 @@ HTTP API. Append new entries; keep alternatives and rationale so the
 
 ---
 
-## ▶ Implementation resume state (rpi-implement) — updated 2026-06-19 (Phase 8 done)
+## ▶ Implementation resume state (rpi-implement) — updated 2026-06-19 (Phase 9 repo work done)
 
 **Plan:** `docs/agents/plans/2026-06-19-sunflower-radio-rewrite.md` (10 phases).
+
+**Phase 9 (Install & service cutover) — REPO WORK DONE, ON-PI STEPS PENDING:**
+- `tools/install` rewritten: `PROJECT=sunflower-radio`, ships `sunflower_radio/`
+  + `web/out/` to `/opt/sunflower-radio` + a `--system-site-packages` venv (apt
+  `python3-evdev`; pip `fastapi/uvicorn/sse-starlette`), never ships `tests/`;
+  rotary overlays into `/boot/firmware/config.txt` keeping pins **17/27/22**;
+  `cutover_services` tears down `dabboard`/`simple-dab-radio`/`radio-cli-shutdown`
+  then enables+starts `sunflower-radio.service`.
+- New `files/etc/systemd/system/sunflower-radio.service` (ExecStart venv python
+  `-m sunflower_radio`, `ExecStop=radio_cli -k`, root, `SUNFLOWER_STATIC_DIR`).
+  Repo `files/` now holds ONLY this unit (dabboard + simple-dab-radio removed).
+- `tools/deploy|restart|logs` added; ssh target one place via `SUNFLOWER_PI_SSH`
+  (default `gingerberry@192.168.1.106`).
+- **Playwright e2e GREEN** (`web/tests/e2e/convergence.spec.ts`): webServer
+  launches the real backend (fake `radio_cli` + built `web/out` on :8137,
+  `pretest:e2e` builds first); 2 specs across two browser contexts assert
+  station + volume SSE convergence + reconnect resync. **Full `tools/check`
+  (both components, incl. Playwright) passes.**
+- **STILL PENDING (on-Pi, needs the hardware + user):** run `tools/install` on
+  the Pi → cutover; `tools/smoke` against the live service; `http://<pi>/`
+  browser check; GPIO-3 shutdown-button verify; clean-install reboot acceptance.
+
+**(below: state as of Phase 8)**
 
 **DONE — Phases 1–8** (all committed; pushed to `origin` + `gitlab`):
 - **Phase 1** baseline regression anchor — knob fixed (re-wired to GPIO

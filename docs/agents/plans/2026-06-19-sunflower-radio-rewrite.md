@@ -321,24 +321,24 @@ core, and the dispatch layer — no HTTP yet. Regression-test against the Phase-
 rotary baseline (Q12 phase 4, Q13.5 rotary half).
 
 **Tasks**:
-- [ ] `sunflower_radio/events.py`: `RotaryEvent(direction=±1)` / `ButtonEvent(pressed)` dataclasses; `EventSource` async protocol yielding normalized events; `EvdevEventSource` decoding raw evdev `RelEvent`/`KeyEvent` (reuse the decode logic from the **Phase-1-restored** `process_events` — the good `4ca7605` copy, not the duplicated broken block); test `FakeEventSource` yields a scripted sequence (Q13.5 Option 1)
-- [ ] `sunflower_radio/state.py`: `RadioState` — holds `volume (0–100)`, `station_index`, station list; volume clamp `0–100`; **`0-100`→`0-63` conversion** (Q8b/Q13.2b, conversion lives above the seam); station wraparound; `snapshot() -> {volume, station:{id,name}}` plus an **additive optional advisory** when the persisted station was lost (D10 — "rescan recommended"); **guard the empty-list case** (no `idx % 0` — D10)
-- [ ] `sunflower_radio/stations.py`: parse ensemble-scan JSON → `[{id, name, srvid, compid, tune_idx}]` (reuse `read_stations` parse from the restored baseline); keep `srvid/compid/tune_idx` OFF the wire (Q8b)
-- [ ] `sunflower_radio/settings.py`: load/save `~/.sunflower-radio.json` — persist the selection as **`ServId` + `Label`** (NOT bare index — D10), plus `volume`; **no I2S keys** (Q9); tolerate an absent file (defaults: volume 25, no selection)
-- [ ] **(D10) Selection reconciliation helper** (in `state.py`): resolve a persisted `{ServId, Label}` against the current station list by **(1) ServId → (2) Label → (3) fall back to index 0 + raise the "previous station unavailable" advisory**; reused by `__main__` startup, the scan endpoint (Phase 6), and the Rescan UI (Phase 8). Handle missing/empty list + out-of-range index without crashing
-- [ ] `sunflower_radio/dispatch.py`: **decode layer** + **dispatch layer** — event → `RadioState` mutation → correct `RadioCli` call (volume turn → `set_volume`, station turn/button → `tune`); assert on the fake `RadioCli` argv (ties to Phase 4 seam)
-- [ ] `__main__.py`: wire `EvdevEventSource` + `RadioState` + `RadioCli`; restore last volume; **reconcile the persisted selection via the D10 helper** (ServId→Label→fallback) before tuning; boot board; apply restored state; if the list is empty/missing, boot into the "no stations — rescan" state instead of crashing; run the async event loop; `SIGTERM`/`SIGINT` → graceful `shutdown()` + save settings (replace old signal handler)
-- [ ] Deploy to the Pi and confirm rotary parity with the Phase-1 baseline
+- [x] `sunflower_radio/events.py`: `RotaryEvent(direction=±1)` / `ButtonEvent(pressed)` dataclasses; `EventSource` async protocol yielding normalized events; `EvdevEventSource` decoding raw evdev `RelEvent`/`KeyEvent` (reuse the decode logic from the **Phase-1-restored** `process_events` — the good `4ca7605` copy, not the duplicated broken block); test `FakeEventSource` yields a scripted sequence (Q13.5 Option 1). **Decode is a pure `decode(type,code,value)` over raw kernel codes (EV_REL/REL_X, EV_KEY/KEY_ENTER) so it unit-tests on macOS without evdev; `EvdevEventSource` imports evdev lazily.**
+- [x] `sunflower_radio/state.py`: `RadioState` — holds `volume (0–100)`, `station_index`, station list; volume clamp `0–100`; **`0-100`→`0-63` conversion** (`round(volume*63/100)`, Q8b/Q13.2b, conversion lives above the seam); station wraparound; `snapshot() -> {volume, station:{id,name}, advisory}` with the **additive optional advisory** when the persisted station was lost (D10 — "rescan recommended"); **guards the empty-list case** (no `idx % 0` — D10)
+- [x] `sunflower_radio/stations.py`: parse ensemble-scan JSON → `Station(id, name, srvid, compid, tune_idx)` (faithful port of legacy `read_stations`); `id` is positional/ephemeral, `srvid/compid/tune_idx` stay OFF the wire (Q8b)
+- [x] `sunflower_radio/settings.py`: load/save `~/.sunflower-radio.json` — persists the selection as **`ServId` + `Label`** (NOT bare index — D10), plus `volume`; **no I2S keys** (Q9); tolerates an absent file (defaults: volume 25, no selection)
+- [x] **(D10) Selection reconciliation helper** (`RadioState.reconcile`): resolve a persisted `Selection{srvid,label}` by **(1) ServId → (2) Label → (3) fall back to index 0 + raise the "previous station unavailable" advisory**; reused by `__main__` startup, the scan endpoint (Phase 6), and the Rescan UI (Phase 8). Handles missing/empty list without crashing; a fresh boot with no persisted selection is index 0 + no advisory
+- [x] `sunflower_radio/dispatch.py`: **`Dispatcher`** — event → `RadioState` mutation → correct `RadioCli` call (VOLUME-mode turn → `set_volume`, TUNER-mode turn → `tune`, button release toggles mode); test asserts on the real `RadioCli` argv over the fake binary (ties to Phase 4 seam)
+- [x] `__main__.py`: wires `EvdevEventSource` + `RadioState` + `RadioCli`; restores last volume; **reconciles the persisted selection via the D10 helper** (ServId→Label→fallback) before tuning; boots board; applies restored state; empty/missing list boots the "no stations — rescan" state instead of crashing; runs the async event loop; `SIGTERM`/`SIGINT` → graceful `shutdown()` + save settings
+- [x] Deploy to the Pi and confirm rotary parity with the Phase-1 baseline — **PASSED 2026-06-19**: ad-hoc deploy to `~/sunflower-deploy/`, run as root via `python -m sunflower_radio` (dabboard stopped); log confirms boot → restore volume 25% → tune #0 Dlf → ready; live knob turns showed volume 25→78% with correct raw conversion, button → TUNER, turn → tune #1 Dlf Kultur, audio confirmed by user. Productionized `tools/install` + `sunflower-radio.service` is Phase 9
 
 **Automated Verification**:
-- [ ] `test_state.py` (Unit): `0-100`→`0-63` conversion table parametrized; clamp at 0/100; station wraparound at both ends
-- [ ] `test_state.py` (Unit, **D10 reconciliation**): persisted `{ServId, Label}` matches by ServId; falls through to Label when ServId changed; falls back to index 0 + raises the advisory when both changed/removed; empty list + out-of-range index don't crash
-- [ ] `test_events.py` (Unit): raw evdev structs → correct normalized `RotaryEvent`/`ButtonEvent`
-- [ ] `test_dispatch.py` (Unit): scripted `FakeEventSource` sequence → expected `RadioCli` argv on the fake (volume vs tuner mode, button toggle)
-- [ ] `tools/check pi-backend` passes
+- [x] `test_state.py` (Unit): `0-100`→`0-63` conversion table parametrized; clamp at 0/100; station wraparound at both ends
+- [x] `test_state.py` (Unit, **D10 reconciliation**): persisted `{ServId, Label}` matches by ServId; falls through to Label when ServId changed; falls back to index 0 + raises the advisory when both changed/removed; empty list + out-of-range index don't crash
+- [x] `test_events.py` (Unit): raw evdev codes → correct normalized `RotaryEvent`/`ButtonEvent`
+- [x] `test_dispatch.py` (Unit): scripted `FakeEventSource` sequence → expected `RadioCli` argv on the fake (volume vs tuner mode, button toggle)
+- [x] `tools/check pi-backend` passes (ruff + mypy strict + 49 pytest)
 
 **Manual Verification** (rotary smoke — un-automatable hardware edge, Q13.5/13.7):
-- [ ] On the Pi: **knob rotation changes volume**, **push toggles mode**, **rotation changes station**, **audio plays** — matches the Phase-1 baseline (no regression from the async rewrite)
+- [x] On the Pi: **knob rotation changes volume**, **push toggles mode**, **rotation changes station**, **audio plays** — matches the Phase-1 baseline (no regression from the async rewrite) — **PASSED 2026-06-19** (user-confirmed; see deploy log)
 
 ---
 

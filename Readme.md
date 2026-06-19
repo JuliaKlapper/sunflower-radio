@@ -1,8 +1,16 @@
-Simple DAB+ Radio
-=================
+Sunflower Radio
+===============
 
-This is a simple radio application using the DAB+-receiver board from
-uGreen.
+A DAB+ radio controller for the Raspberry Pi, using the DAB+-receiver board
+from uGreen. It is being rewritten into **`sunflower-radio`**: a single async
+Python service (rotary encoder + HTTP/SSE API) fronted by a Next.js web UI,
+with the physical knob and any LAN browser as first-class control surfaces.
+
+> **Attribution / licence.** `sunflower-radio` is a derivative work of
+> [`simple-dab-radio`](https://github.com/bablokb/simple-dab-radio.git) by
+> Bernhard Bablok and remains licensed under the **GPL-3.0** (see `LICENSE`).
+> The sections below document the original `simple-dab-radio` behaviour and
+> are superseded as the rewrite lands.
 
 Hardware Requirements
 ---------------------

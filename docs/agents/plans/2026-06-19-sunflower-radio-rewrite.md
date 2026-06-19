@@ -298,17 +298,17 @@ Build the test scaffolding that makes the async rewrite testable without the Pi
 (D2-iii "biggest accelerator", Q13.1/13.3). TDD throughout (assertions first).
 
 **Tasks**:
-- [ ] `sunflower_radio/radio_cli.py`: `RadioCli` async wrapper — ctor takes `path` (pure DI, Q13.3d); 5 methods over `asyncio.create_subprocess_exec`: `boot()` (`-b D -o 0`), `shutdown()` (`-k`), `set_volume(raw_0_63)` (`-l <n>`), `tune(compid, srvid, tune_idx)` (`-c -e -f -p`), `scan() -> ensemble_json` (`-b D -u -k`). Faithful translator; speaks **raw 0–63** (Q13.2b); **no `sudo`**
-- [ ] Composition-root path resolution (in `__main__.py` stub): `RADIO_CLI_PATH` env → single hardcoded default constant = **`/usr/local/sbin/radio_cli`** (the stable symlink confirmed in Phase 1) (Q13.3d)
-- [ ] `pi-backend/tests/fixtures/fake_radio_cli`: committed extensionless `#!/usr/bin/env python3`, `chmod +x` — **dumb recorder** (Q13.3a/b): append argv to `$FAKE_RADIO_CLI_LOG`; on `-u` print canned `ensemble_scan.json` to stdout; exit `0` unless `$FAKE_RADIO_CLI_RC` set. **Validates nothing**
-- [ ] Commit the real `ensemble_scan.json` captured in Phase 1 to `pi-backend/tests/fixtures/`
-- [ ] Place fixtures under `pi-backend/tests/` (never under the install-shipped source) so `tools/install` cannot mirror the fake binary onto the Pi (PATH-shadowing hazard, Q13.3c); add a code comment recording this constraint for the Phase 9 install rewrite to honour
-- [ ] `tests/test_radio_cli_integration.py`: construct `RadioCli(path=<fixture>)`, drive each method, **assert on the logged argv** (exact flags, order, no stray `sudo`) and on `scan()` returning the fixture JSON; an error-path test sets `FAKE_RADIO_CLI_RC` and asserts the wrapper surfaces non-zero
+- [x] `sunflower_radio/radio_cli.py`: `RadioCli` async wrapper — ctor takes `path` (pure DI, Q13.3d); 5 methods over `asyncio.create_subprocess_exec`: `boot()` (`-b D -o 0`), `shutdown()` (`-k`), `set_volume(raw_0_63)` (`-l <n>`), `tune(compid, srvid, tune_idx)` (`-c -e -f -p`), `scan() -> ensemble_json` (`-b D -u -k`). Faithful translator; speaks **raw 0–63** (Q13.2b); **no `sudo`**. `_run` captures stdout/stderr, raises `RuntimeError` on non-zero exit
+- [x] Composition-root path resolution (in `__main__.py` stub): `RADIO_CLI_PATH` env → single hardcoded default constant = **`/usr/local/sbin/radio_cli`** (the stable symlink confirmed in Phase 1) (Q13.3d). `resolve_radio_cli_path()` + `DEFAULT_RADIO_CLI_PATH`; full wiring deferred to Phases 5-6
+- [x] `pi-backend/tests/fixtures/fake_radio_cli`: committed extensionless `#!/usr/bin/env python3`, `chmod +x` — **dumb recorder** (Q13.3a/b): append shell-quoted argv to `$FAKE_RADIO_CLI_LOG`; on `-u` print sibling `ensemble_scan.json` to stdout; exit `0` unless `$FAKE_RADIO_CLI_RC` set. **Validates nothing**
+- [x] Commit the real `ensemble_scan.json` captured in Phase 1 to `pi-backend/tests/fixtures/` — present (40 KB, 41 ensembles / 5 valid); staged in the Phase-4 commit
+- [x] Place fixtures under `pi-backend/tests/` (never under the install-shipped source) so `tools/install` cannot mirror the fake binary onto the Pi (PATH-shadowing hazard, Q13.3c); add a code comment recording this constraint for the Phase 9 install rewrite to honour — recorded in the `fake_radio_cli` docstring
+- [x] `tests/test_radio_cli_integration.py`: construct `RadioCli(path=<fixture>)`, drive each method, **assert on the logged argv** (exact flags, order, no stray `sudo`) and on `scan()` returning the fixture JSON; an error-path test sets `FAKE_RADIO_CLI_RC` and asserts the wrapper surfaces non-zero — 7 tests, TDD (RED watched first)
 
 **Automated Verification**:
-- [ ] `fake_radio_cli` is executable and runnable by hand (`./fake_radio_cli -k` exits 0, logs argv)
-- [ ] `test_radio_cli_integration` (Integration) passes — argv assertions green, scan returns fixture JSON, error path surfaces non-zero
-- [ ] `tools/check pi-backend` passes
+- [x] `fake_radio_cli` is executable and runnable by hand (`./fake_radio_cli -k` exits 0, logs argv)
+- [x] `test_radio_cli_integration` (Integration) passes — argv assertions green, scan returns fixture JSON, error path surfaces non-zero
+- [x] `tools/check pi-backend` passes
 
 ---
 

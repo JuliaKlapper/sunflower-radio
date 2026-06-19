@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""Fake radio_cli — a dumb argv recorder for the RadioCli integration test.
+
+It validates NOTHING about the flags it is handed; it only records them and,
+for a scan, replays a canned capture. The real contract (exact flags, order,
+no stray `sudo`) is asserted by the test that reads the log this writes.
+
+Behaviour (Q13.3a/b):
+- Append the received argv (one shell-quoted line) to `$FAKE_RADIO_CLI_LOG`.
+- On a scan (`-u` present), print the sibling `ensemble_scan.json` to stdout —
+  this is exactly what the real `radio_cli -b D -u -k` emits.
+- Exit 0, unless `$FAKE_RADIO_CLI_RC` is set, in which case exit with that code
+  (lets the test drive the wrapper's error path).
+
+This file lives under tests/ and must NEVER be shipped by tools/install: on the
+Pi it would PATH-shadow the real board CLI (Q13.3c).
+"""
+
+import os
+import shlex
+import sys
+from pathlib import Path
+
+argv = sys.argv[1:]
+
+log_path = os.environ.get("FAKE_RADIO_CLI_LOG")
+if log_path:
+    with open(log_path, "a") as log:
+        log.write(shlex.join(argv) + "\n")
+
+if "-u" in argv:
+    scan = Path(__file__).resolve().parent / "ensemble_scan.json"
+    sys.stdout.write(scan.read_text())
+
+sys.exit(int(os.environ.get("FAKE_RADIO_CLI_RC", "0")))

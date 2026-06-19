@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# tools/check — the backpressure quality gate for sunflower-radio.
+#
+# Thin orchestrator that delegates to each component's idiomatic runners and
+# aggregates results (run-all-and-report: every step runs, failures are
+# collected, the exit code is non-zero if ANY step failed).
+#
+# Usage:
+#   tools/check                 full check, both components (incl. Playwright e2e)
+#   tools/check pi-backend      scope to the Python backend only
+#   tools/check web             scope to the web UI only
+#   tools/check --fast          ruff + mypy + eslint + tsc + UNIT tests; NO Playwright e2e
+#   tools/check --fix           apply SAFE auto-fixes, then re-report the rest
+#
+# Flags compose with a scope, e.g. `tools/check pi-backend --fast`.
+set -uo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PI="$ROOT/pi-backend"
+WEB="$ROOT/web"
+
+SCOPE="all"
+FAST=0
+FIX=0
+for arg in "$@"; do
+  case "$arg" in
+    pi-backend|web) SCOPE="$arg" ;;
+    --fast)         FAST=1 ;;
+    --fix)          FIX=1 ;;
+    *) echo "tools/check: unknown argument '$arg'" >&2; exit 2 ;;
+  esac
+done
+
+FAILURES=()
+
+# run <label> <dir> <command...> — run a labeled step, report PASS/FAIL, collect failures.
+run() {
+  local label="$1" dir="$2"; shift 2
+  printf '\n\033[1m▶ %s\033[0m\n' "$label"
+  if ( cd "$dir" && "$@" ); then
+    printf '\033[32m[PASS] %s\033[0m\n' "$label"
+  else
+    printf '\033[31m[FAIL] %s\033[0m\n' "$label"
+    FAILURES+=("$label")
+  fi
+}
+
+# ---------------------------------------------------------------- pi-backend
+check_pi() {
+  if ! command -v uv >/dev/null 2>&1; then
+    echo "pi-backend: 'uv' not found — skipping (install uv to enable backend checks)" >&2
+    FAILURES+=("pi-backend: uv missing")
+    return
+  fi
+  if [ "$FIX" -eq 1 ]; then
+    # lint-fix first (may rewrite code/imports), then format last so it wins on whitespace.
+    run "pi-backend: ruff check --fix" "$PI" uv run ruff check --fix .
+    run "pi-backend: ruff format"      "$PI" uv run ruff format .
+  fi
+  run "pi-backend: ruff format --check" "$PI" uv run ruff format --check .
+  run "pi-backend: ruff check"          "$PI" uv run ruff check .
+  run "pi-backend: mypy"                "$PI" uv run mypy .
+  run "pi-backend: pytest"              "$PI" uv run pytest -q
+}
+
+# ---------------------------------------------------------------------- web
+check_web() {
+  if [ ! -d "$WEB/node_modules" ]; then
+    echo "web: node_modules absent — skipping (run 'npm --prefix web install'; scaffolded in Phase 7)" >&2
+    return
+  fi
+  if [ "$FIX" -eq 1 ]; then
+    # lint-fix first, then prettier last so formatting wins on whitespace.
+    run "web: eslint --fix"     "$WEB" npm run --silent lint -- --fix
+    run "web: prettier --write" "$WEB" npm run --silent format
+  fi
+  run "web: prettier --check" "$WEB" npm run --silent format:check
+  run "web: eslint"           "$WEB" npm run --silent lint
+  run "web: tsc --noEmit"     "$WEB" npm run --silent typecheck
+  run "web: vitest (unit)"    "$WEB" npm run --silent test:unit
+  if [ "$FAST" -eq 0 ]; then
+    run "web: playwright e2e" "$WEB" npm run --silent test:e2e
+  else
+    echo "web: skipping Playwright e2e (--fast)"
+  fi
+}
+
+if [ "$SCOPE" = "all" ] || [ "$SCOPE" = "pi-backend" ]; then check_pi; fi
+if [ "$SCOPE" = "all" ] || [ "$SCOPE" = "web" ]; then check_web; fi
+
+# ------------------------------------------------------------------- report
+echo
+if [ "${#FAILURES[@]}" -eq 0 ]; then
+  printf '\033[32m=== all checks passed ===\033[0m\n'
+  exit 0
+fi
+printf '\033[31m=== %d check(s) failed ===\033[0m\n' "${#FAILURES[@]}"
+for f in "${FAILURES[@]}"; do printf '  \033[31m- %s\033[0m\n' "$f"; done
+exit 1

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# tools/setup — one-time developer setup. Wires the repo-local git hooks so the
+# backpressure gate (tools/check --fast) runs on every commit.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+git config core.hooksPath tools/git-hooks
+chmod +x tools/git-hooks/* tools/check tools/setup 2>/dev/null || true
+
+echo "git hooksPath -> $(git config core.hooksPath)"
+echo "setup complete. Commits now run 'tools/check --fast' (report-only)."

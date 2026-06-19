@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# pre-commit — backpressure gate. Runs the fast check (lint + types + unit
+# tests, NO Playwright e2e) and blocks the commit if it fails.
+#
+# Report-only with ZERO side effects: it never formats, fixes, or re-stages
+# files. Fix issues yourself (e.g. `tools/check --fix`) and re-commit.
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+if ! "$ROOT/tools/check" --fast; then
+  echo
+  echo "pre-commit: tools/check --fast failed — commit aborted." >&2
+  echo "            fix the issues (try 'tools/check --fix') and commit again." >&2
+  echo "            to bypass in an emergency: git commit --no-verify" >&2
+  exit 1
+fi

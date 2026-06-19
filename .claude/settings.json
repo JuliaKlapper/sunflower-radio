@@ -1,0 +1,48 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/session-start-tts.sh\""
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "find \"$CLAUDE_PROJECT_DIR/.claude/audio\" -type f \\( -name '*.aiff' -o -name '*.wav' \\) -not -path '*/tracks/*' -delete 2>/dev/null || true",
+            "statusMessage": "Cleaning TTS audio cache"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if ! git diff --quiet -- pi-backend web tools 2>/dev/null; then echo '[backpressure] tracked code changed — running tools/check --fast (advisory):'; tools/check --fast || true; fi",
+            "statusMessage": "Backpressure: tools/check --fast"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(tools/check*)",
+      "Bash(tools/setup*)",
+      "Bash(tools/install*)",
+      "Bash(tools/deploy*)",
+      "Bash(tools/restart*)",
+      "Bash(tools/logs*)",
+      "Bash(tools/smoke*)"
+    ]
+  },
+  "$schema": "https://json.schemastore.org/claude-code-settings.json"
+}

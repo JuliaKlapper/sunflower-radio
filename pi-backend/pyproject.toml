@@ -1,0 +1,55 @@
+[project]
+name = "sunflower-radio"
+version = "0.1.0"
+description = "Async DAB+ radio controller for the Raspberry Pi (rotary + HTTP/SSE API)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "sse-starlette>=2.1",
+    # evdev is Linux-only (needs linux/input.h); skipped on macOS dev machines.
+    "evdev>=1.7 ; sys_platform == 'linux'",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",  # FastAPI TestClient dependency (Phase 6 api tests)
+]
+
+# This is an application, not a distributable library: uv manages the venv and
+# deps but does not build/install the sunflower_radio package. Tests import it
+# via the pytest pythonpath below. (sunflower_radio/ lands in Phase 4-6.)
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# legacy/ is the frozen pre-rewrite reference (bablokb's GPL3 original); it is a
+# read-only port source, not maintained code, and is deleted once Phases 4-6
+# finish porting its logic. Never lint/format it.
+extend-exclude = ["legacy"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, isort, pyupgrade, bugbear, comprehensions, simplify
+select = ["E", "F", "I", "UP", "B", "C4", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+exclude = ["^legacy/"]
+# evdev ships no type stubs; the EvdevEventSource seam (Phase 5) is the only importer.
+[[tool.mypy.overrides]]
+module = "evdev.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"

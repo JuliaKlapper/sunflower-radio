@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "agentvibes": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--package=agentvibes",
+        "agentvibes-mcp-server"
+      ],
+      "env": {
+        "AGENTVIBES_MCP_FALLBACK": "copilot"
+      }
+    }
+  }
+}

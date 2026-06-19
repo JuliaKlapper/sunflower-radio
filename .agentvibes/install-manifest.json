@@ -1,0 +1,430 @@
+{
+  "version": 1,
+  "updatedAt": "2026-06-18T08:41:46.797Z",
+  "files": {
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/add.md": {
+      "hash": "bd3daaa8a3ef7dc1c705db8340b80ec34ad63af8063718b5056e251138d8d03a",
+      "installedAt": "2026-06-18T08:41:46.748Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/agent-vibes.md": {
+      "hash": "38477538c4f015c0e2014ca2f1ee6f751a61541ac2bcdfa6a3ed212b567e9105",
+      "installedAt": "2026-06-18T08:41:46.750Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/agent.md": {
+      "hash": "98e3cbd512678f9a622a93b8aae420abfe08829a4fd5ac27b238a2ff211ac23b",
+      "installedAt": "2026-06-18T08:41:46.750Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/background-music.md": {
+      "hash": "21495a8fd1de53707a7f501a02eb79ef6933cf95e69a475bd1f92dbd8c645599",
+      "installedAt": "2026-06-18T08:41:46.751Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/bmad.md": {
+      "hash": "42b56448eee2bceafc2788bb5f39de0b5f06d37d681f8b99073bd89695ad1704",
+      "installedAt": "2026-06-18T08:41:46.752Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/clean.md": {
+      "hash": "e52b75db5d5a1e8982c3649ab87b511a958d7249708c9c3461ec86325e5d37f8",
+      "installedAt": "2026-06-18T08:41:46.752Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/cleanup.md": {
+      "hash": "f341bacd736bdbd508f7368a8489a8eb30c0ad807cd7783bc972f8aad8fa0ca7",
+      "installedAt": "2026-06-18T08:41:46.753Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/commands.json": {
+      "hash": "5bbb20ee98049f94c1fddc6088564f8f4ad12b7ac79a39089d14066cec1dd406",
+      "installedAt": "2026-06-18T08:41:46.753Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/effects.md": {
+      "hash": "c7df70141beead591e2bcd1e6a68913ab58e15580d62a4bedd3fc336ac6646da",
+      "installedAt": "2026-06-18T08:41:46.754Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/get.md": {
+      "hash": "197611671de8163d0e3b519d199eaceb8a57c3c3a1e08cc0e8d6f2feaa9caf67",
+      "installedAt": "2026-06-18T08:41:46.754Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/hide.md": {
+      "hash": "80ac0970d257d8774f14ce7eb0e82f6bc281db35b81d6fa02e1f3489748f6baa",
+      "installedAt": "2026-06-18T08:41:46.755Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/language.md": {
+      "hash": "94808a41f74907fc971a571379c76699da79f753ace461d7044547e29af8b796",
+      "installedAt": "2026-06-18T08:41:46.755Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/learn.md": {
+      "hash": "f3ef20f6180ccd621bcbed03a437cb97dd12eb25fa650a0e3f298047f3f98112",
+      "installedAt": "2026-06-18T08:41:46.755Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/list.md": {
+      "hash": "6fcbe3a38c16c823c2296595c7a0fc635ddbeb8539eacbcc5ea54cf3270b2377",
+      "installedAt": "2026-06-18T08:41:46.756Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/mute.md": {
+      "hash": "7920d44b03dc402d6f42ec74921ec334bdce256a8be6bc540d91fe086f8b23fe",
+      "installedAt": "2026-06-18T08:41:46.756Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/personality.md": {
+      "hash": "1722d7c69794ef817e94e3c706f21aaa5e3ec8ea8f2c66f6c570670dae81aa74",
+      "installedAt": "2026-06-18T08:41:46.756Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/preview.md": {
+      "hash": "86ca6cbb47a45bdcc91d8e13fce08d49935364e07834296583e27f6cadc6d903",
+      "installedAt": "2026-06-18T08:41:46.757Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/provider.md": {
+      "hash": "c4e6c9126a5ebbebeed6922f0cd644c8de3aa6400ad122e13b51fe4565a9459e",
+      "installedAt": "2026-06-18T08:41:46.757Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/replay-target.md": {
+      "hash": "5f4f5da3bd968dd8d13df9988ade88eeaae9536bc503c33d847198b6a5b96c68",
+      "installedAt": "2026-06-18T08:41:46.758Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/replay.md": {
+      "hash": "1b561f9ba3ce5ec07007e98fe76eb78e726f2b95615204d0dec6e07bbb6e21f4",
+      "installedAt": "2026-06-18T08:41:46.758Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/sample.md": {
+      "hash": "48b6c99c007524bbfc1010c7bbebc676dcdfd48a74784d66cbabf1d6bc7db0c8",
+      "installedAt": "2026-06-18T08:41:46.758Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/sentiment.md": {
+      "hash": "7c92333484b2c80a46f778a9e0860bb9f1086271a2e6eae41bd96482f214d593",
+      "installedAt": "2026-06-18T08:41:46.759Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/set-favorite-voice.md": {
+      "hash": "9662a5c080c703a1a1e79195133a9ccbfbf074c2fe8c84297cd7a35b8be810af",
+      "installedAt": "2026-06-18T08:41:46.759Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/set-language.md": {
+      "hash": "95354538191c97124721e6aa7d90915b4e2018050112c0937091b5107a5c8246",
+      "installedAt": "2026-06-18T08:41:46.759Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/set-pretext.md": {
+      "hash": "31388d03a8145481b4f9fcd6bd6f2bb24124d039ae97ba8b51feaf1dfc845f10",
+      "installedAt": "2026-06-18T08:41:46.760Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/set-speed.md": {
+      "hash": "9513f877200d0faf86f8c19fc26b2c2b87b856d9e86bd30154f18648d09c305c",
+      "installedAt": "2026-06-18T08:41:46.761Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/show.md": {
+      "hash": "5dcc027996e3520555f23eaea5f5da42d7cd6ea45a009c26372e96a60847c61e",
+      "installedAt": "2026-06-18T08:41:46.761Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/switch.md": {
+      "hash": "192038da652af01cd54a8ad0bc2dbcd48ac4059ac43c2a4df839e4909820403b",
+      "installedAt": "2026-06-18T08:41:46.761Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/target-voice.md": {
+      "hash": "9c3ac8d1249ae8fc8014b21a9e785bcb4b69e9e65f3869c91b396b4d95e288fb",
+      "installedAt": "2026-06-18T08:41:46.762Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/target.md": {
+      "hash": "634dfbc6ec274179d58fb0fe9e6281b07ee7c20cd9f9bf02e00c8e920e8b83c4",
+      "installedAt": "2026-06-18T08:41:46.762Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/translate.md": {
+      "hash": "bbc8a9488ec71c03b9bcdc6db1da771331ddd6c97ad851b99a7985d874ff6884",
+      "installedAt": "2026-06-18T08:41:46.762Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/unmute.md": {
+      "hash": "1f843039e69b03c077aac56138eeb1d2a7cb1129ce6893b361623ef9f755da05",
+      "installedAt": "2026-06-18T08:41:46.763Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/update.md": {
+      "hash": "bc1022c7d70cbd6b9b0ad69806e8206cb70b446711db6147d7447d99639e2b6e",
+      "installedAt": "2026-06-18T08:41:46.763Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/verbosity.md": {
+      "hash": "d56647186ce6540c8ae48fd2e8f5ede040743f09f6a2bc372ccc5de28946bd40",
+      "installedAt": "2026-06-18T08:41:46.764Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/version.md": {
+      "hash": "bbc5ba5abaf44af6893e3232791268fd4d9f80d68bac0b95bfbec3cf44869e4f",
+      "installedAt": "2026-06-18T08:41:46.764Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/commands/agent-vibes/whoami.md": {
+      "hash": "04909e3350e9ccb5886067edc19b37597f846a2bfb1502c1286e33fb6895ba23",
+      "installedAt": "2026-06-18T08:41:46.764Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/audio-cache-utils.sh": {
+      "hash": "12f3198bc340b01a4cb815f2af00865050294ca141e0df6feb5d31931ef684d6",
+      "installedAt": "2026-06-18T08:41:46.770Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/audio-processor.sh": {
+      "hash": "82efc1e67f51a6906414ee04c0053f405869590743b80c04c3ef3f9e34d294be",
+      "installedAt": "2026-06-18T08:41:46.771Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/background-music-manager.sh": {
+      "hash": "1be2e32d910c080117350b359699b9c20a7ab0a2ccb6e95c809f21a9d8299eeb",
+      "installedAt": "2026-06-18T08:41:46.771Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/bmad-party-speak.sh": {
+      "hash": "ec87c086ddeddf12c720affd97ca874a744c9b051d49f60899d5030c83e785bb",
+      "installedAt": "2026-06-18T08:41:46.771Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/bmad-speak-enhanced.sh": {
+      "hash": "1c80292b63469cf8a616af6a1dde7c0fef1ef5534ae801bc416485e43e25d49c",
+      "installedAt": "2026-06-18T08:41:46.772Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/bmad-speak.sh": {
+      "hash": "f4387ff58987bda5a137dab46046608ad417923eba74f0bcae7c1137e5755854",
+      "installedAt": "2026-06-18T08:41:46.772Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/bmad-tts-injector.sh": {
+      "hash": "cc61b39d8ba0a71e4eab4926e8895daf82997ec4ff43926952f2599175046c13",
+      "installedAt": "2026-06-18T08:41:46.773Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/bmad-voice-manager.sh": {
+      "hash": "7ef0326706e438e2bfef763776f4863ee2924b2172df033f77159ab63b403926",
+      "installedAt": "2026-06-18T08:41:46.773Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/clawdbot-receiver-SECURE.sh": {
+      "hash": "0aeb488dd6f345c3a6fecfceda1e68c1179312f1dad0e867bebf51c19bca5e29",
+      "installedAt": "2026-06-18T08:41:46.773Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/clawdbot-receiver.sh": {
+      "hash": "c3678870ec11aaabc4e0677727de9524c557da7df1a99e6a1d84057c112698b7",
+      "installedAt": "2026-06-18T08:41:46.774Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/clean-audio-cache.sh": {
+      "hash": "7bf5c92fe9df1cce94fbb28a393b0052a898f8ccee01fff17c405f68a2503313",
+      "installedAt": "2026-06-18T08:41:46.774Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/cleanup-cache.sh": {
+      "hash": "f41fba9a48836f4fba60501b6dacfb05890221ecca04cc52a3897714a43ae45c",
+      "installedAt": "2026-06-18T08:41:46.774Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/configure-rdp-mode.sh": {
+      "hash": "ffb82f1f8a792dcc9e66faba6f2afce826485e9e0c977625ab53577624dbf148",
+      "installedAt": "2026-06-18T08:41:46.775Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/download-extra-voices.sh": {
+      "hash": "2fbae741205701f72d326a781ee92b38535d64913fa0b245991b5beaf0a57ac8",
+      "installedAt": "2026-06-18T08:41:46.775Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/effects-manager.sh": {
+      "hash": "a56577ee56a316f87129e79046d750bb70cb89832e63f4b7efcbea408070faa1",
+      "installedAt": "2026-06-18T08:41:46.776Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/github-star-reminder.sh": {
+      "hash": "a07911f1aa424f20f966049710ea2b8002a2d1ec423b3b40b67ec0942bc86701",
+      "installedAt": "2026-06-18T08:41:46.776Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/language-manager.sh": {
+      "hash": "5756b4686ec2e20190bf85f4f74c54b708f04d21c755ad2378b88d5ee1aac444",
+      "installedAt": "2026-06-18T08:41:46.776Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/learn-manager.sh": {
+      "hash": "57eeb4f82b5074b7830b391626196058b96b06414c0fca66025647b10e8d7d0c",
+      "installedAt": "2026-06-18T08:41:46.777Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/macos-voice-manager.sh": {
+      "hash": "1f04f7ea7ba8e8c862dd9f59f9977d159ffcfcd41883f265baf80320545b1ad1",
+      "installedAt": "2026-06-18T08:41:46.777Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/migrate-background-music.sh": {
+      "hash": "960505fb346365189f069ab185584d6d6f8b1024daeb881de51dc0969a072dd3",
+      "installedAt": "2026-06-18T08:41:46.777Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/migrate-to-agentvibes.sh": {
+      "hash": "0317cd629430feb811f415527f8699ec5ada9be3675440a2489cb0c65138d557",
+      "installedAt": "2026-06-18T08:41:46.777Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/optimize-background-music.sh": {
+      "hash": "685862003d4bbbedb1a94d2ed95217054578b51075bb5f926871c1f5a9ac8d50",
+      "installedAt": "2026-06-18T08:41:46.778Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/path-resolver.sh": {
+      "hash": "11341ae59c4e9f584a21cad53a94349c3d68d6f4625d369cf63891088d68ba1f",
+      "installedAt": "2026-06-18T08:41:46.778Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/personality-manager.sh": {
+      "hash": "f6616ab941a796f728fe37645b9e98fc643c6b5a9dddad9b0f8203132bc830a1",
+      "installedAt": "2026-06-18T08:41:46.778Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/piper-download-voices.sh": {
+      "hash": "5d470b13340728295b99ec683e9247c7713f50367a0ba027cf466a583eba5dcf",
+      "installedAt": "2026-06-18T08:41:46.779Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/piper-installer.sh": {
+      "hash": "af40bc622555304380248ebc2ba043d84a3f66cd6cbe3d7534da57f1962b99de",
+      "installedAt": "2026-06-18T08:41:46.779Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/piper-multispeaker-registry.sh": {
+      "hash": "d1d55e15ca16ccc81af912463be9a27faf27242d34628e5e6d6e846bc565014a",
+      "installedAt": "2026-06-18T08:41:46.779Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/piper-voice-manager.sh": {
+      "hash": "a09371add655c266f9f00887d1da99e51726850629e723d70b637ea8c50a9be5",
+      "installedAt": "2026-06-18T08:41:46.780Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts-agentvibes-receiver-for-voiceless-connections.sh": {
+      "hash": "1e2cb701fb61e7aef50b54f5601eb5510d3d994f4d65c8fa375382cfc539c55f",
+      "installedAt": "2026-06-18T08:41:46.780Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts-enhanced.sh": {
+      "hash": "2274151489750072d5e7d672168f8fcc21a9e2d4cfc2e092330a17862d52d722",
+      "installedAt": "2026-06-18T08:41:46.780Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts-macos.sh": {
+      "hash": "9cbad50003f3db999d4eaa78075127c187afc40e98ab9c410d5c6c2dd7ef3b09",
+      "installedAt": "2026-06-18T08:41:46.781Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts-piper.sh": {
+      "hash": "3462068f56a050cf09e924faeeb23d29765db6d66c7287a965663dc644ea9489",
+      "installedAt": "2026-06-18T08:41:46.781Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts-soprano.sh": {
+      "hash": "0a49b6de253512abed4c5e0b6c21438ba646b21df905a5b2abd838882e5355e7",
+      "installedAt": "2026-06-18T08:41:46.781Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts-ssh-remote.sh": {
+      "hash": "514aad0043ee816c6997f7264d7ef0df8fa130ea02ca1e9b3543d99b15426881",
+      "installedAt": "2026-06-18T08:41:46.782Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts-termux-ssh.sh": {
+      "hash": "d2b2eb3aad871d71130de0b67a37c623bf72c5192e8cd1005286dcd9e511b43f",
+      "installedAt": "2026-06-18T08:41:46.782Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts-windows-receiver.sh": {
+      "hash": "d83abb59223f01577b9e86d7dcf9a04a3f29a9ad7f58942b7fd17fae32222883",
+      "installedAt": "2026-06-18T08:41:46.782Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/play-tts.sh": {
+      "hash": "d544cb73e97f47e7d1b2181bd823438f2ab182ce33a3ee46bd866f4f361afd0c",
+      "installedAt": "2026-06-18T08:41:46.783Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/provider-commands.sh": {
+      "hash": "ff99181ba6aca43925d7106403762a9dd65a35c9ba84e780561e96dc3b09afb7",
+      "installedAt": "2026-06-18T08:41:46.783Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/provider-manager.sh": {
+      "hash": "62cadcc3e53d9963d559198e53c4c9f3b9386a2e073a3e48f70a9e23c6dedd1c",
+      "installedAt": "2026-06-18T08:41:46.784Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/replay-target-audio.sh": {
+      "hash": "f0f8068c871a74494e77d4fc52e91a577e2481c57aa3e4db115109395d854802",
+      "installedAt": "2026-06-18T08:41:46.784Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/sentiment-manager.sh": {
+      "hash": "a75e63b6de59a162a1088a73edf85af8ab1e952ce5eaa570d67c3f3680de3ccb",
+      "installedAt": "2026-06-18T08:41:46.784Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/session-start-tts.sh": {
+      "hash": "d472a3df6d240ada38e7a8b95055c20f3235d8db145cd94ec698d7ad9c460f06",
+      "installedAt": "2026-06-18T08:41:46.784Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/speed-manager.sh": {
+      "hash": "071c25019cc9fc00e3f08b3aa2ff8b648e21d9c761b0377e7fde006233d3e1c2",
+      "installedAt": "2026-06-18T08:41:46.785Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/stop-tts.sh": {
+      "hash": "26b1d924956e6da864e8a5a3a1e7ce12424534bf8b8af7186c30adacfffb2344",
+      "installedAt": "2026-06-18T08:41:46.785Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/termux-installer.sh": {
+      "hash": "d8c6875d5bb674c584d65864d16a6500267285c8f4e1cc74f4e626378acf3694",
+      "installedAt": "2026-06-18T08:41:46.786Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/translate-manager.sh": {
+      "hash": "ca707162b225c0d8206ca64595f9a6f0a61fe6be243dde7232b0ab21942795ad",
+      "installedAt": "2026-06-18T08:41:46.787Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/tts-queue-worker.sh": {
+      "hash": "90c88097a5e5705c09ee97c240f6e3da74847b1b80b4f27e2182237dead8b803",
+      "installedAt": "2026-06-18T08:41:46.787Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/tts-queue.sh": {
+      "hash": "47c9f41716a8f386f61e2631b8203ac42df9e95c7a101cd4db9b1dd46ff5f6ea",
+      "installedAt": "2026-06-18T08:41:46.787Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/verbosity-manager.sh": {
+      "hash": "86d1a5a76d847090cf3abd86fc33a8d4450194886eb0fe1236fe3467f44842f9",
+      "installedAt": "2026-06-18T08:41:46.788Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/hooks/voice-manager.sh": {
+      "hash": "f74b1e433e9d1117a7c37c04fa6c9135b8790f3510cc3314262765c83da1ec93",
+      "installedAt": "2026-06-18T08:41:46.788Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/angry.md": {
+      "hash": "fb1711508b4d42dbfc15f57175dcb0f2da4fac034b68659dacc0991a72afc795",
+      "installedAt": "2026-06-18T08:41:46.792Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/annoying.md": {
+      "hash": "ced090e4e5696b8c06ee605a701a6f5c3e7d90ff9850915eca1e5b682eabcaf1",
+      "installedAt": "2026-06-18T08:41:46.792Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/crass.md": {
+      "hash": "46a51249e60c41bdf2046903b83965f6265bf34445812ac425601fbfab8660bb",
+      "installedAt": "2026-06-18T08:41:46.793Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/dramatic.md": {
+      "hash": "68864221d652dc95055a60f005400ea5e0c2b38c4c75f16d7299a1582d8fed6e",
+      "installedAt": "2026-06-18T08:41:46.793Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/dry-humor.md": {
+      "hash": "ec1dbfbb525f1b7e641a911bbcba3649ef70880adaa01c0b281c4580bae63365",
+      "installedAt": "2026-06-18T08:41:46.793Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/flirty.md": {
+      "hash": "328ea5a06bf9b9569825922924ae51f7f0b1b3985001ea273a8a9bacf2e02615",
+      "installedAt": "2026-06-18T08:41:46.794Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/funny.md": {
+      "hash": "a68efc479819b11c6dfda43f3b290f51740cdfa938c4e3e3e96bd0d656f63fa3",
+      "installedAt": "2026-06-18T08:41:46.794Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/grandpa.md": {
+      "hash": "3a2dff1e4d8b121cdcb6fe4c745a9fac5d254156a3658a309319056af9fce42c",
+      "installedAt": "2026-06-18T08:41:46.794Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/millennial.md": {
+      "hash": "f69dfa3958153c82ed62fb940360c74beaa8d71ef13d41f32500e9f58fca346c",
+      "installedAt": "2026-06-18T08:41:46.794Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/moody.md": {
+      "hash": "5d4e6278ef0d453d64ad4b940667ddad1d59aa9f327ae0a11227085e22690884",
+      "installedAt": "2026-06-18T08:41:46.795Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/normal.md": {
+      "hash": "25a209d55a7e752c21cc10688349f1602e769b436639c28850db5c5fd431570f",
+      "installedAt": "2026-06-18T08:41:46.795Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/pirate.md": {
+      "hash": "e529aa181574a341bb511dc87929116df112ce21b575726a3f0521406da07cf4",
+      "installedAt": "2026-06-18T08:41:46.795Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/poetic.md": {
+      "hash": "57e2506800cdb647fc9f42a904d7da1e5e5b72cf0491fd2527907b64d943bc29",
+      "installedAt": "2026-06-18T08:41:46.795Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/professional.md": {
+      "hash": "e89d6bb62eda126e8c5d9d0cc7bf4b9cced7a641b6ea626d0a3d8c93b3e18af3",
+      "installedAt": "2026-06-18T08:41:46.796Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/rapper.md": {
+      "hash": "322f36183ddc583306b21a008de469dd116b76f042eeb3dc0dbd4cda42f94dfd",
+      "installedAt": "2026-06-18T08:41:46.796Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/robot.md": {
+      "hash": "f4a05b06ebe7c86c4120f36ad077b1edcbdbe9e25662d7f58817faa656e7361b",
+      "installedAt": "2026-06-18T08:41:46.796Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/sarcastic.md": {
+      "hash": "2ce5689b090ea58b8356ca703c0376713cf74a83ab86c19e599611fe82ad9b1a",
+      "installedAt": "2026-06-18T08:41:46.796Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/sassy.md": {
+      "hash": "e069c093fdc1d7d6bd80c2db8600caea1d4a8a14d89e818101d4ef4514582b52",
+      "installedAt": "2026-06-18T08:41:46.797Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/surfer-dude.md": {
+      "hash": "adc1270e42e661a33d1344be2477c92becdb1bb97da46a7eb30dcca5e36d6afc",
+      "installedAt": "2026-06-18T08:41:46.797Z"
+    },
+    "/Users/julia.klapper/Projects/own/simple-dab-radio/.claude/personalities/zen.md": {
+      "hash": "cbf56fb5b16fa05024353646ad77615483e9ffe8ac550d1e3a66860e9370189a",
+      "installedAt": "2026-06-18T08:41:46.797Z"
+    }
+  }
+}

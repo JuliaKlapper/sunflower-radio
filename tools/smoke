@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+# tools/smoke — real-behaviour smoke test against the LIVE service on the Pi.
+#
+# Exercises the actual radio_cli + board end-to-end over HTTP (Q13.7 real-behaviour
+# mandate): the unit/integration suites run against the fake binary, this is the
+# one check that proves the deployed process answers on the network and that a
+# command actually changes server state.
+#
+#   GET  /api/state     → valid {volume, station, advisory} shape
+#   GET  /api/stations  → non-empty list
+#   POST /api/volume    → the echoed state reflects the new volume
+#
+# The Pi host lives in exactly one place (Q17); override with SUNFLOWER_PI_HOST.
+# Requires the service to be running and reachable on the LAN.
+set -uo pipefail
+
+PI_HOST="${SUNFLOWER_PI_HOST:-192.168.1.106}"
+BASE="http://$PI_HOST"
+PY="${PYTHON:-python3}"
+
+FAILURES=0
+fail() { printf '\033[31m[FAIL] %s\033[0m\n' "$1" >&2; FAILURES=$((FAILURES + 1)); }
+pass() { printf '\033[32m[PASS] %s\033[0m\n' "$1"; }
+
+# get <path> — fetch a URL, echo the body, non-zero on transport failure.
+get() { curl -fsS --max-time 10 "$BASE$1"; }
+
+echo "▶ smoke against $BASE"
+
+# --- GET /api/state: valid shape -------------------------------------------
+state="$(get /api/state)" || { fail "GET /api/state (unreachable)"; }
+if [ -n "${state:-}" ] && echo "$state" | "$PY" -c \
+    'import sys,json; d=json.load(sys.stdin); assert "volume" in d and "station" in d and "advisory" in d' 2>/dev/null; then
+  pass "GET /api/state shape"
+else
+  fail "GET /api/state shape: ${state:-<empty>}"
+fi
+
+# --- GET /api/stations: non-empty list -------------------------------------
+stations="$(get /api/stations)" || true
+if [ -n "${stations:-}" ] && echo "$stations" | "$PY" -c \
+    'import sys,json; d=json.load(sys.stdin); assert isinstance(d,list) and len(d)>0' 2>/dev/null; then
+  pass "GET /api/stations non-empty"
+else
+  fail "GET /api/stations non-empty: ${stations:-<empty>}"
+fi
+
+# --- POST /api/volume: actually changes state ------------------------------
+# Pick a target distinct from the current volume so the assertion is meaningful.
+current="$(echo "${state:-{}}" | "$PY" -c 'import sys,json; print(json.load(sys.stdin).get("volume",0))' 2>/dev/null || echo 0)"
+target=$(( current >= 50 ? 30 : 70 ))
+echoed="$(curl -fsS --max-time 10 -H 'Content-Type: application/json' \
+    -d "{\"volume\": $target}" "$BASE/api/volume")" || true
+if [ -n "${echoed:-}" ] && echo "$echoed" | "$PY" -c \
+    "import sys,json; assert json.load(sys.stdin)['volume']==$target" 2>/dev/null; then
+  pass "POST /api/volume → $target"
+else
+  fail "POST /api/volume → $target: ${echoed:-<empty>}"
+fi
+
+echo
+if [ "$FAILURES" -eq 0 ]; then
+  printf '\033[32m=== smoke passed ===\033[0m\n'
+  exit 0
+fi
+printf '\033[31m=== %d smoke check(s) failed ===\033[0m\n' "$FAILURES"
+exit 1

@@ -350,19 +350,19 @@ Add the FastAPI layer and the server-authoritative SSE broadcaster in the same
 process (D4/D5, D7, D8a). Integration-test from laptop curl (Q12 phase 5).
 
 **Tasks**:
-- [ ] `sunflower_radio/broadcaster.py`: subscriber registry of async queues; register/unregister; `publish(snapshot)` fans out one identical `state` payload to **all** subscribers including the initiator (D7 convergence). (Coalesce-to-latest policy added in Phase 10; here a simple bounded queue is fine)
-- [ ] Route every mutation (rotary via dispatch, HTTP commands) through one path that updates `RadioState` then calls `broadcaster.publish(snapshot)` — single shape of truth
-- [ ] `sunflower_radio/api.py` (FastAPI): `GET /api/state` (snapshot), `GET /api/stations` (cheap, no scan), `POST /api/volume {volume:0-100}` → echoes full state, `POST /api/station {id}` → echoes full state, `POST /api/scan` (async `radio_cli -b D -u -k` → reload list → **reconcile selection via the D10 ServId→Label→fallback helper** → broadcast), `GET /api/events` (SSE via `sse-starlette`)
-- [ ] **Structured error model** (Q8b): `{error:{code,message}}` with `400`/`404`/`409`/`503`/`500`; codes like `station_not_found`
-- [ ] Mount `StaticFiles` at `/` (serves `web/out/` in prod) while `/api/*` handles the API — same origin, same port (D5/C1). Tolerate missing `web/out/` in dev
-- [ ] Run FastAPI + the rotary event loop in one `asyncio` process; ensure a slow `scan()` never blocks rotary or SSE
-- [ ] `tools/smoke`: laptop→Pi-over-SSH curl checks — `GET /api/state` valid shape, `POST /api/volume` changes it, `GET /api/stations` non-empty (Q13.7 automated half; satisfies the real-behaviour mandate)
+- [x] `sunflower_radio/broadcaster.py`: subscriber registry of async queues; register/unregister; `publish(snapshot)` fans out one identical `state` payload to **all** subscribers including the initiator (D7 convergence). Phase 6 uses a simple unbounded `asyncio.Queue`; coalesce-to-latest is Phase 10 (only this module changes then)
+- [x] **Single mutation path:** both surfaces funnel through the one `Dispatcher` — rotary `handle()` and the new HTTP command methods (`set_volume`/`set_station`/`scan`) each mutate `RadioState`, drive `RadioCli`, then `_broadcast()` the snapshot. `api.py` holds only the `Dispatcher`, so there is one shape of truth
+- [x] `sunflower_radio/api.py` (FastAPI `create_app`): `GET /api/state`, `GET /api/stations` (cheap, no scan), `POST /api/volume {volume:0-100}` → echoes full state, `POST /api/station {id}` → echoes full state, `POST /api/scan` (`radio_cli -b D -u -k` → reload list → **reconcile via the D10 ServId→Label→fallback helper** → retune → broadcast), `GET /api/events` (SSE via `sse-starlette`, sends current state on connect then every broadcast)
+- [x] **Structured error model** (Q8b): exception handlers map to `{error:{code,message}}` — validation → `400 bad_request`, `StationNotFound` → `404 station_not_found`, `RadioCli` `RuntimeError` → `503 radio_unavailable`. (`409`/`500` hardening is Phase 10)
+- [x] Mount `StaticFiles` at `/` (serves `web/out/` in prod, resolved via `SUNFLOWER_STATIC_DIR`) AFTER the `/api/*` routes so the API wins; tolerate a missing build in dev (web app is Phase 7)
+- [x] Run FastAPI + the rotary event loop in one `asyncio` process: `__main__` runs `server.serve()` with `dispatcher.run(EvdevEventSource())` as a concurrent task; uvicorn owns SIGTERM/SIGINT, graceful board shutdown + settings-save runs in the `finally`. The multi-second `scan()` is on the `RadioCli` subprocess seam, so it never blocks rotary or SSE
+- [x] `tools/smoke`: curl checks against the live Pi service (host in one place via `SUNFLOWER_PI_HOST`, Q17) — `GET /api/state` valid shape, `GET /api/stations` non-empty, `POST /api/volume` actually changes the echoed state (Q13.7 real-behaviour mandate)
 
 **Automated Verification**:
-- [ ] `test_broadcaster.py` (Unit): register N fake subscribers, trigger a mutation, assert all N receive exactly one identical snapshot (D7 fan-out, Layer 1 — Q13.5)
-- [ ] `test_api.py` (Integration, FastAPI `TestClient` + fake `RadioCli`): each endpoint returns the documented shape; bad input → `400`; unknown station id → `404` with `station_not_found`; commands echo full state
-- [ ] `tools/check pi-backend` passes
-- [ ] `tools/smoke` (laptop→Pi over SSH) against the live service passes — `GET /api/state` valid shape, `POST /api/volume` actually changes it, `GET /api/stations` non-empty; exercises real `radio_cli` + board end-to-end (Q13.7 real-behaviour mandate, agent-runnable)
+- [x] `test_broadcaster.py` (Unit): register N subscribers, publish once, assert all N receive exactly one identical snapshot; unsubscribe stops delivery (D7 fan-out, Layer 1 — Q13.5)
+- [x] `test_api.py` (Integration, FastAPI `TestClient` + fake `RadioCli`): each endpoint returns the documented shape; `volume:999` → `400 bad_request`; unknown id `99` → `404 station_not_found`; commands echo full state; `/api/scan` reloads the list; `/api/events` opens with the current state (driven at the ASGI layer to avoid the sync-client SSE deadlock)
+- [x] `tools/check pi-backend` passes (ruff + mypy strict + 60 pytest). Also locally smoke-ran `python -m sunflower_radio` against the fake binary: boot → no-stations advisory → scan loads 60 stations → volume/station commands → 404 on bad id → graceful shutdown; live `curl -N /api/events` saw the initial state then the volume-88 broadcast (D7 convergence confirmed end-to-end on macOS)
+- [ ] `tools/smoke` against the **live service on the Pi** — **deferred to Phase 9 by user (2026-06-19).** Phase 6 adds `fastapi`/`uvicorn`/`sse-starlette`, absent on the Pi; the live smoke folds into the Phase-9 install (venv/deps + `sunflower-radio.service` on :80) rather than an ad-hoc deploy now. Pi probed read-only (Python 3.13 / Debian trixie, `~/sunflower-deploy/` present, `dabboard` stopped); no writes made. Exercises the real `radio_cli` + board end-to-end (Q13.7).
 
 ---
 

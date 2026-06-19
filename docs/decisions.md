@@ -6,6 +6,47 @@ HTTP API. Append new entries; keep alternatives and rationale so the
 
 ---
 
+## ▶ Implementation resume state (rpi-implement) — updated 2026-06-19 (Phase 7 pause)
+
+**Plan:** `docs/agents/plans/2026-06-19-sunflower-radio-rewrite.md` (10 phases).
+
+**DONE — Phases 1–7** (all committed; pushed to `origin` + `gitlab`):
+- **Phase 1** baseline regression anchor — knob fixed (re-wired to GPIO
+  17/27/22; was mis-wired to 18/23/14 via the G341 splitter, NOT a code bug);
+  real ensemble fixture captured.
+- **Phase 2** repo cutover/restructure (`461e62a`); **Phase 3** backpressure
+  scaffold (`tools/check`, pre-commit hook, advisory Stop hook).
+- **Phase 4** `RadioCli` async seam + committed `fake_radio_cli` + ensemble
+  fixture; **Phase 5** async core — `events`/`state`/`stations`/`settings`/
+  `dispatch`/`__main__`, D10 reconciliation, rotary parity verified on the Pi.
+- **Phase 6** (`387910c`) HTTP API + SSE broadcaster: `broadcaster.py`,
+  `api.py` (6 endpoints, structured `{error:{code,message}}`), single
+  Dispatcher mutation path, uvicorn + rotary in one process. 60 pytest green;
+  live SSE convergence verified locally against the fake binary.
+- **Phase 7** Next.js static-export scaffold: `app/` shell, `lib/`
+  (`types`/`api`/`useStateStream`), Vitest smoke test, `output:'export'` build
+  → `out/`. Same-origin serving (`/` + `/api/*` on one port) proven locally.
+
+**NEXT — Phase 8 (Sunflower UI):** build the single screen — `SunflowerCircle`
+(ring of dots, tappable → immediate tune), `StationStepper`, `VolumeSlider`
+(debounced commit; freeze SSE reconciliation while dragging, resume on release —
+D7/Q15c), `RescanButton` + `ScanningOverlay`; yellow-on-dark theme; Vitest for
+the debounce/drag-gating logic + the Playwright e2e multi-client SSE convergence
+suite under `web/tests/e2e/`. After Phase 8 the **full** `tools/check web`
+(incl. Playwright) goes green. Model: Sonnet 4.6 (escalate to Opus if SSE-client
+convergence bugs appear).
+
+**Deferred to Phase 9 (Pi-dependent, by user 2026-06-19):** `tools/smoke`
+against the live service + the `http://<pi>/` browser check. Both need the
+backend deps (`fastapi`/`uvicorn`/`sse-starlette`) installed on the Pi, which
+folds into the Phase-9 install. Pi probed read-only this session: Python 3.13 /
+Debian trixie, `~/sunflower-deploy/` present, `dabboard` stopped — no writes.
+
+**Still uncommitted (intentional):** `files/.../simple-dab-radio.service`
+deletion is Phase 9's drop; this resume block lives in `decisions.md`.
+
+---
+
 ## How to resume this grilling session
 
 Open Claude Code in this repo. Invoke the `grill-me` skill. Then say:

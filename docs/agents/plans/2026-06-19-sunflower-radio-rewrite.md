@@ -398,19 +398,21 @@ Build the single-screen sunflower control panel and wire it to the SSE stream
 (Q15a–e). Live state in the browser (Q12 phase 7).
 
 **Tasks**:
-- [ ] `components/SunflowerCircle.tsx`: ring of positioned dots (no canvas), color/size encode distance from selected; selected dot highlighted/centered with station `#N — Name`; **tappable dots → immediate `POST /api/station`** (Q15d); animates on SSE change
-- [ ] `components/StationStepper.tsx`: prev/next `◀ ▶` → immediate tune (reliable on a dense dial, Q15d)
-- [ ] `components/VolumeSlider.tsx`: native `<input type="range">` `0–100`; **debounced commit** on settle/throttle; **SSE reconciliation** moves the slider on knob/other-client change **except while actively dragging**, resume on release (Q15c, D7)
-- [ ] `components/RescanButton.tsx` + `components/ScanningOverlay.tsx`: secondary "Rescan" → `POST /api/scan`; **scanning state** disables station+volume + shows overlay; **post-scan reconciliation** reloads list + re-syncs selection via SSE (Q15b2)
-- [ ] Theme: yellow/gold accents on dark base; honor `prefers-color-scheme`; retune the dot distance-palette to harmonize on dark (Q15e). No manual toggle
-- [ ] `web/tests/`: Vitest for component logic (debounce, drag-vs-reconcile gating, immediate-tune dispatch); `web/tests/e2e/` Playwright — open page, change volume from a second client, assert first client's DOM updates live + reconnect-on-drop (Q13.5 Layer 2, the reserved Playwright tool)
+- [x] `components/SunflowerCircle.tsx`: ring of positioned dots (no canvas, pure CSS `left/top` %), color/size encode circular distance from selected (hue 120°→0° green→red + size taper); selected dot highlighted with the accent + centered as `#NN — Name`; **tappable dots → immediate `onSelect` → `POST /api/station`** (Q15d); CSS transitions animate on SSE change
+- [x] `components/StationStepper.tsx`: prev/next `◀ ▶` → immediate tune with **client-side wraparound** (`(index+dir) mod n`; the backend 404s out-of-range and the wire id is positional, Q15d)
+- [x] `components/VolumeSlider.tsx`: native `<input type="range">` `0–100`; **debounced commit** (150 ms settle, flush-on-release); **SSE reconciliation** moves the slider on knob/other-client change **except while actively dragging** — implemented via an `adopted` ref so release does NOT snap back to the pre-drag value and a mid-drag external change applies on release (Q15c, D7)
+- [x] `components/RescanButton.tsx` + `components/ScanningOverlay.tsx`: secondary "Rescan" → `POST /api/scan`; **scanning state** disables circle+stepper+volume + shows the overlay; **post-scan reconciliation** reloads the station list (`getStations`) + re-syncs selection via the scan echo / SSE (Q15b2)
+- [x] Theme: yellow/gold accents on dark/light base; honor `prefers-color-scheme` (per-scheme dot lightness/saturation vars so the green→red distance ramp stays legible on both, Q15e). No manual toggle
+- [x] `web/tests/`: Vitest for component logic — debounce + drag-vs-reconcile gating + no-snap-back (`VolumeSlider.test.tsx`), wraparound + empty-list (`StationStepper.test.tsx`), tap-to-tune + selected/centre rendering (`SunflowerCircle.test.tsx`), Rescan dispatch + overlay (`controls.test.tsx`), page orchestration: live render + immediate-tune dispatch + Rescan list-reload (`page.test.tsx`). **20 tests, all green.**
+- [~] `web/tests/e2e/` Playwright multi-client SSE convergence + reconnect — **DEFERRED to Phase 9 (user, 2026-06-19):** the faithful test drives the real Python backend (uvicorn + SSE) which isn't installed locally; it folds into the Phase-9 on-Pi install alongside `tools/smoke` and the `http://<pi>/` browser check. `tools/check --fast` (the pre-commit gate) is green now; the **full** `tools/check web` goes green in Phase 9.
 
 **Automated Verification**:
-- [ ] Vitest: volume slider commits debounced (not per-pixel); slider ignores SSE while dragging, reconciles on release; tapping a dot / stepping dispatches `POST /api/station`
-- [ ] Playwright e2e: second-client volume change updates the first client's DOM live; reconnect after a dropped stream resyncs via `GET /api/state`
-- [ ] `tools/check` (full, incl. Playwright) passes
+- [x] Vitest: volume slider commits debounced (not per-pixel); slider ignores SSE while dragging, reconciles on release (no snap-back); tapping a dot / stepping dispatches an immediate tune — green (`tools/check web --fast`, 20 tests)
+- [x] `tools/check web --fast` passes (prettier + eslint + tsc + Vitest); `npm run build` produces a clean static `out/` with the new components
+- [~] Playwright e2e: second-client volume change updates the first client's DOM live; reconnect after a dropped stream resyncs via `GET /api/state` — **deferred to Phase 9** (needs the live backend)
+- [~] `tools/check` (full, incl. Playwright) passes — **deferred to Phase 9** (`--fast` is green now)
 
-**Manual Verification** (multi-surface convergence — the project's defining feature):
+**Manual Verification** (multi-surface convergence — the project's defining feature) — **deferred to Phase 9** (Pi-dependent; needs the backend deps installed on the Pi):
 - [ ] Open the UI on two devices + use the physical knob: a change on any surface (knob, phone, tablet) converges on all others live via SSE
 - [ ] Trigger Rescan: overlay shows, controls disable, list reloads after the scan; **audio plays** on the reconciled station
 - [ ] Rescan while a station is selected: confirm the selection reconciles to the **same station by identity** even if its list index shifted, or falls back sensibly if that station vanished from the new scan (Q15b2 index-shift handling)
@@ -429,6 +431,7 @@ atomically swap `dabboard.service` → `sunflower-radio.service` (Q11, Q12.1, Q1
 - [ ] New `files/etc/systemd/system/sunflower-radio.service`: `ExecStart` the new entrypoint, **`ExecStop=<radio_cli> -k`** preserved, `TimeoutStopSec=120s`, `Restart=on-failure`, `User=root`, `WantedBy=multi-user.target` (shutdown chain must survive — session notes)
 - [ ] Cutover: disable+remove `dabboard.service`, enable `sunflower-radio.service`, atomic swap (no window where the repo and Pi disagree on unit name)
 - [ ] `tools/deploy` (rsync build → Pi), `tools/restart` (ssh systemctl restart), `tools/logs` (ssh journalctl -u) — each holds the host `gingerberry@192.168.1.106` in one place (Q17); confirm script names pre-approved (Phase 3)
+- [ ] **Playwright e2e (carried from Phase 8):** install Chromium, add a `playwright.config` `webServer` that launches the real backend (`uv run python -m sunflower_radio` against `tests/fixtures/fake_radio_cli` + the built `web/out/`); specs open two browser contexts and assert a volume/station change in one converges live on the other via SSE, plus reconnect-after-drop resyncs via `GET /api/state` (Q13.5 Layer 2). After this, the **full** `tools/check web` (incl. Playwright) goes green
 - [ ] Verify `gpio-shutdown` overlay + GPIO 3 shutdown button still work post-cutover (session notes — preserve)
 - [ ] Drop the stale `simple-dab-radio.service`, legacy `/boot/config.txt` notes, and disabled `radio-cli-shutdown.service` per the deferred-cleanup session note
 
@@ -436,6 +439,7 @@ atomically swap `dabboard.service` → `sunflower-radio.service` (Q11, Q12.1, Q1
 - [ ] `tools/install` on the Pi completes without error; `systemctl is-enabled sunflower-radio.service` → `enabled`; `dabboard.service` gone
 - [ ] `tools/smoke` passes against the freshly-installed service
 - [ ] `tools/restart` / `tools/logs` work and require no broad-ssh approval prompt
+- [ ] `tools/check` (full, incl. the Phase-8-carried Playwright e2e) passes — the last not-yet-green gate
 
 **Manual Verification** (clean-install acceptance):
 - [ ] Fresh `tools/install` + reboot: radio auto-starts, knob works, `http://<pi>/` works, **audio plays**

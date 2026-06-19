@@ -6,11 +6,11 @@ HTTP API. Append new entries; keep alternatives and rationale so the
 
 ---
 
-## ▶ Implementation resume state (rpi-implement) — updated 2026-06-19 (Phase 7 pause)
+## ▶ Implementation resume state (rpi-implement) — updated 2026-06-19 (Phase 8 done)
 
 **Plan:** `docs/agents/plans/2026-06-19-sunflower-radio-rewrite.md` (10 phases).
 
-**DONE — Phases 1–7** (all committed; pushed to `origin` + `gitlab`):
+**DONE — Phases 1–8** (all committed; pushed to `origin` + `gitlab`):
 - **Phase 1** baseline regression anchor — knob fixed (re-wired to GPIO
   17/27/22; was mis-wired to 18/23/14 via the G341 splitter, NOT a code bug);
   real ensemble fixture captured.
@@ -27,20 +27,30 @@ HTTP API. Append new entries; keep alternatives and rationale so the
   (`types`/`api`/`useStateStream`), Vitest smoke test, `output:'export'` build
   → `out/`. Same-origin serving (`/` + `/api/*` on one port) proven locally.
 
-**NEXT — Phase 8 (Sunflower UI):** build the single screen — `SunflowerCircle`
-(ring of dots, tappable → immediate tune), `StationStepper`, `VolumeSlider`
-(debounced commit; freeze SSE reconciliation while dragging, resume on release —
-D7/Q15c), `RescanButton` + `ScanningOverlay`; yellow-on-dark theme; Vitest for
-the debounce/drag-gating logic + the Playwright e2e multi-client SSE convergence
-suite under `web/tests/e2e/`. After Phase 8 the **full** `tools/check web`
-(incl. Playwright) goes green. Model: Sonnet 4.6 (escalate to Opus if SSE-client
-convergence bugs appear).
+- **Phase 8** Sunflower UI: `SunflowerCircle` (CSS ring of dots, hue/size encode
+  distance, tappable → immediate tune), `StationStepper` (client-side
+  wraparound), `VolumeSlider` (150 ms debounce + flush-on-release; SSE
+  reconciliation frozen while dragging via an `adopted` ref so release never
+  snaps back — D7/Q15c), `RescanButton` + `ScanningOverlay`, yellow-on-dark
+  theme (per-scheme dot palette). `page.tsx` orchestrates: SSE state + a
+  once-then-after-scan station-list fetch. **20 Vitest tests green**;
+  `tools/check web --fast` + `npm run build` clean.
 
-**Deferred to Phase 9 (Pi-dependent, by user 2026-06-19):** `tools/smoke`
-against the live service + the `http://<pi>/` browser check. Both need the
-backend deps (`fastapi`/`uvicorn`/`sse-starlette`) installed on the Pi, which
-folds into the Phase-9 install. Pi probed read-only this session: Python 3.13 /
-Debian trixie, `~/sunflower-deploy/` present, `dabboard` stopped — no writes.
+**NEXT — Phase 9 (Install & service cutover):** rewrite `tools/install`
+(`PROJECT=sunflower-radio`, ship `pi-backend/` + `web/out/`, never `tests/`,
+rotary overlays in `/boot/firmware/config.txt` keeping 17/27/22),
+`sunflower-radio.service` (`ExecStop=radio_cli -k`), atomic `dabboard.service`
+cutover, `tools/deploy|restart|logs`. Model: Sonnet 4.6.
+
+**Deferred to Phase 9 (Pi-dependent / live-backend, by user 2026-06-19):**
+- `tools/smoke` against the live service + the `http://<pi>/` browser check.
+- **Playwright e2e** multi-client SSE convergence + reconnect (`web/tests/e2e/`):
+  needs the real uvicorn/SSE backend, which isn't installed locally — folds into
+  the Phase-9 install. `tools/check --fast` (pre-commit gate) is green; the
+  **full** `tools/check web` (incl. Playwright) goes green in Phase 9.
+- All need the backend deps (`fastapi`/`uvicorn`/`sse-starlette`) on the Pi. Pi
+  probed read-only: Python 3.13 / Debian trixie, `~/sunflower-deploy/` present,
+  `dabboard` stopped — no writes.
 
 **Still uncommitted (intentional):** `files/.../simple-dab-radio.service`
 deletion is Phase 9's drop; this resume block lives in `decisions.md`.
